@@ -1,0 +1,22 @@
+{
+	"module_path": "github.com/aeramu/menfess-backend",
+	"entity": [
+		"User",
+		"Post"
+	],
+	"service": [
+		"Login",
+		"Register",
+		"UpdateProfile",
+		"GetUser",
+		"GetMenfessList",
+		"GetPost",
+		"GetPostList",
+		"CreatePost",
+		"LikePost"
+	],
+	"adapter": [
+		"UserRepository",
+		"PostRepository"
+	]
+}

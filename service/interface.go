@@ -1,0 +1,35 @@
+package service
+
+import (
+	"context"
+	"github.com/aeramu/menfess-backend/entity"
+)
+
+type Adapter struct {
+	UserModule         UserModule
+	PostModule         PostModule
+	AuthModule         AuthModule
+	NotificationModule NotificationModule
+	LogModule          LogModule
+}
+
+type AuthModule interface {
+	GenerateToken(ctx context.Context, user entity.User) (string, error)
+	ComparePassword(ctx context.Context, hash string, password string) error
+}
+
+type UserModule interface {
+	FindUserByEmail(ctx context.Context, email string) (*entity.User, error)
+	InsertUser(ctx context.Context, user entity.User) error
+}
+
+type PostModule interface {
+}
+
+type NotificationModule interface {
+	AddPushToken(ctx context.Context, userID string, pushToken string) error
+}
+
+type LogModule interface {
+	Log(err error, payload interface{}, message string)
+}
