@@ -38,15 +38,22 @@ func (_m *UserModule) FindUserByEmail(ctx context.Context, email string) (*entit
 }
 
 // InsertUser provides a mock function with given fields: ctx, user
-func (_m *UserModule) InsertUser(ctx context.Context, user entity.User) error {
+func (_m *UserModule) InsertUser(ctx context.Context, user entity.User) (string, error) {
 	ret := _m.Called(ctx, user)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, entity.User) error); ok {
+	var r0 string
+	if rf, ok := ret.Get(0).(func(context.Context, entity.User) string); ok {
 		r0 = rf(ctx, user)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(string)
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, entity.User) error); ok {
+		r1 = rf(ctx, user)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }

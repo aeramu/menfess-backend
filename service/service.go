@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/aeramu/menfess-backend/constants"
+	"github.com/aeramu/menfess-backend/entity"
 	"github.com/aeramu/menfess-backend/service/api"
 )
 
@@ -61,7 +62,46 @@ func (s *service) Login(ctx context.Context, req api.LoginReq) (*api.LoginRes, e
 }
 
 func (s *service) Register(ctx context.Context, req api.RegisterReq) (*api.RegisterRes, error) {
-	panic("implement me")
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	if _, err := s.adapter.UserModule.FindUserByEmail(ctx, req.Email); err != nil {
+		if err != constants.ErrUserNotFound {
+			s.adapter.LogModule.Log(err, req, "[Register] failed find user from repo")
+			return nil, constants.ErrInternalServerError
+		}
+	} else {
+		return nil, constants.ErrEmailAlreadyRegistered
+	}
+
+	hash, err := s.adapter.AuthModule.HashPassword(ctx, req.Password)
+	if err != nil {
+		s.adapter.LogModule.Log(err, req, "[Register] failed hash password")
+		return nil, constants.ErrInternalServerError
+	}
+
+	user := entity.User{
+		Account: entity.Account{
+			Email:    req.Email,
+			Password: hash,
+		},
+	}
+
+	id, err := s.adapter.UserModule.InsertUser(ctx, user)
+	if err != nil {
+		s.adapter.LogModule.Log(err, req, "[Register] failed insert user")
+		return nil, constants.ErrInternalServerError
+	}
+	user.ID = id
+
+	token, err := s.adapter.AuthModule.GenerateToken(ctx, user)
+	if err != nil {
+		s.adapter.LogModule.Log(err, req, "[Register] failed generate token")
+		return nil, constants.ErrInternalServerError
+	}
+
+	return &api.RegisterRes{Token: token}, nil
 }
 
 func (s *service) UpdateProfile(ctx context.Context, req api.UpdateProfileReq) (*api.UpdateProfileRes, error) {

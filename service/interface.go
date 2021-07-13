@@ -16,11 +16,12 @@ type Adapter struct {
 type AuthModule interface {
 	GenerateToken(ctx context.Context, user entity.User) (string, error)
 	ComparePassword(ctx context.Context, hash string, password string) error
+	HashPassword(ctx context.Context, password string) (string, error)
 }
 
 type UserModule interface {
 	FindUserByEmail(ctx context.Context, email string) (*entity.User, error)
-	InsertUser(ctx context.Context, user entity.User) error
+	InsertUser(ctx context.Context, user entity.User) (string, error)
 }
 
 type PostModule interface {

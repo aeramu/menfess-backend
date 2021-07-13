@@ -48,3 +48,24 @@ func (_m *AuthModule) GenerateToken(ctx context.Context, user entity.User) (stri
 
 	return r0, r1
 }
+
+// HashPassword provides a mock function with given fields: ctx, password
+func (_m *AuthModule) HashPassword(ctx context.Context, password string) (string, error) {
+	ret := _m.Called(ctx, password)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(context.Context, string) string); ok {
+		r0 = rf(ctx, password)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, password)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

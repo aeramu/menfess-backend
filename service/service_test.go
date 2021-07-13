@@ -200,7 +200,24 @@ func Test_service_Login(t *testing.T)  {
 
 func Test_service_Register(t *testing.T)  {
 	var (
-
+		ctx = context.Background()
+		err = errors.New("some error")
+		user = entity.User{
+			ID:      "id-1",
+			Account: entity.Account{
+				Email:    "sulam3010@gmail.com",
+				Password: "password",
+			},
+			Profile: entity.Profile{},
+		}
+		hashedPassword = "hashedPassword"
+		pushToken = "asdf1234"
+		req = api.RegisterReq{
+			Email:     user.Account.Email,
+			Password:  user.Account.Password,
+			PushToken: pushToken,
+		}
+		token = "hadslfkjwq1434"
 	)
 	type args struct {
 		ctx context.Context
@@ -213,7 +230,139 @@ func Test_service_Register(t *testing.T)  {
 		want    *api.RegisterRes
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "invalid request",
+			prepare: nil,
+			args:    args{
+				ctx: ctx,
+				req: api.RegisterReq{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when find user from db",
+			prepare: func() {
+				mockUserModule.On("FindUserByEmail", mock.Anything, req.Email).
+					Return(nil, err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "email already registered",
+			prepare: func() {
+				mockUserModule.On("FindUserByEmail", mock.Anything, req.Email).
+					Return(&user, nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "email already registered",
+			prepare: func() {
+				mockUserModule.On("FindUserByEmail", mock.Anything, req.Email).
+					Return(&user, nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when hash password",
+			prepare: func() {
+				mockUserModule.On("FindUserByEmail", mock.Anything, req.Email).
+					Return(nil, constants.ErrUserNotFound)
+				mockAuthModule.On("HashPassword", mock.Anything, req.Password).
+					Return("", err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when insert user",
+			prepare: func() {
+				mockUserModule.On("FindUserByEmail", mock.Anything, req.Email).
+					Return(nil, constants.ErrUserNotFound)
+				mockAuthModule.On("HashPassword", mock.Anything, req.Password).
+					Return(hashedPassword, nil)
+				mockUserModule.On("InsertUser", mock.Anything, mock.Anything).
+					Return("", err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when generate token",
+			prepare: func() {
+				mockUserModule.On("FindUserByEmail", mock.Anything, req.Email).
+					Return(nil, constants.ErrUserNotFound)
+				mockAuthModule.On("HashPassword", mock.Anything, req.Password).
+					Return(hashedPassword, nil)
+				mockUserModule.On("InsertUser", mock.Anything, mock.MatchedBy(func(u entity.User) bool{
+					assert.Equal(t, req.Email, u.Account.Email)
+					assert.Equal(t, hashedPassword, u.Account.Password)
+					return true
+				})).Return(user.ID, nil)
+				user.Account.Password = hashedPassword
+				mockAuthModule.On("GenerateToken", mock.Anything, user).
+					Return("", err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			prepare: func() {
+				mockUserModule.On("FindUserByEmail", mock.Anything, req.Email).
+					Return(nil, constants.ErrUserNotFound)
+				mockAuthModule.On("HashPassword", mock.Anything, req.Password).
+					Return(hashedPassword, nil)
+				mockUserModule.On("InsertUser", mock.Anything, mock.MatchedBy(func(u entity.User) bool{
+					assert.Equal(t, req.Email, u.Account.Email)
+					assert.Equal(t, hashedPassword, u.Account.Password)
+					return true
+				})).Return(user.ID, nil)
+				user.Account.Password = hashedPassword
+				mockAuthModule.On("GenerateToken", mock.Anything, user).
+					Return(token, nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    &api.RegisterRes{
+				Token: token,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
