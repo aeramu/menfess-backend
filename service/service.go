@@ -104,8 +104,28 @@ func (s *service) Register(ctx context.Context, req api.RegisterReq) (*api.Regis
 	return &api.RegisterRes{Token: token}, nil
 }
 
+// TODO: Refactor case when user not found, expected to insert new profile
 func (s *service) UpdateProfile(ctx context.Context, req api.UpdateProfileReq) (*api.UpdateProfileRes, error) {
-	panic("implement me")
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	profile, err := s.adapter.UserModule.FindUserByID(ctx, req.ID)
+	if err != nil {
+		s.adapter.LogModule.Log(err, req, "[UpdateProfile] failed get user")
+		return nil, constants.ErrInternalServerError
+	}
+
+	profile.Profile.Name = req.Name
+	profile.Profile.Avatar = req.Avatar
+	profile.Profile.Bio = req.Bio
+
+	if err := s.adapter.UserModule.SaveProfile(ctx, *profile); err != nil {
+		s.adapter.LogModule.Log(err, req, "[UpdateProfile] failed save profile")
+		return nil, constants.ErrInternalServerError
+	}
+
+	return &api.UpdateProfileRes{Message: "success"}, nil
 }
 
 func (s *service) GetUser(ctx context.Context, req api.GetUserReq) (*api.GetUserRes, error) {

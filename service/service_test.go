@@ -387,7 +387,14 @@ func Test_service_Register(t *testing.T)  {
 
 func Test_service_UpdateProfile(t *testing.T)  {
 	var (
-
+		ctx = context.Background()
+		req = api.UpdateProfileReq{
+			ID:     "id",
+			Name:   "John",
+			Avatar: "avatar",
+			Bio:    "test",
+		}
+		err = errors.New("some error")
 	)
 	type args struct {
 		ctx context.Context
@@ -400,7 +407,66 @@ func Test_service_UpdateProfile(t *testing.T)  {
 		want    *api.UpdateProfileRes
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "invalid request",
+			prepare: nil,
+			args:    args{
+				ctx: ctx,
+				req: api.UpdateProfileReq{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when get user from db",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.ID).
+					Return(nil, err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when save profile",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.ID).
+					Return(&entity.User{ID: req.ID}, nil)
+				mockUserModule.On("SaveProfile", mock.Anything, mock.Anything).
+					Return(err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.ID).
+					Return(&entity.User{ID: req.ID}, nil)
+				mockUserModule.On("SaveProfile", mock.Anything, mock.MatchedBy(func(u entity.User) bool{
+					assert.Equal(t, req.ID, u.ID)
+					assert.Equal(t, req.Name, u.Profile.Name)
+					assert.Equal(t, req.Avatar, u.Profile.Avatar)
+					assert.Equal(t, req.Bio, u.Profile.Bio)
+					return true
+				})).Return(nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    &api.UpdateProfileRes{Message: "success"},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

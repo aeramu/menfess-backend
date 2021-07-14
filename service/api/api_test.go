@@ -143,3 +143,91 @@ func TestRegisterReq_Validate(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateProfileReq_Validate(t *testing.T) {
+	type fields struct {
+		ID     string
+		Name   string
+		Avatar string
+		Bio    string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		{
+			name:    "empty id",
+			fields:  fields{
+				ID:     "",
+				Name:   "",
+				Avatar: "",
+				Bio:    "",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "empty name",
+			fields:  fields{
+				ID:     "id",
+				Name:   "",
+				Avatar: "avatar",
+				Bio:    "",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "name only space",
+			fields:  fields{
+				ID:     "id",
+				Name:   " ",
+				Avatar: "avatar",
+				Bio:    "",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "empty avatar",
+			fields:  fields{
+				ID:     "id",
+				Name:   "john",
+				Avatar: "",
+				Bio:    "",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "avatar only space",
+			fields:  fields{
+				ID:     "id",
+				Name:   "john",
+				Avatar: " ",
+				Bio:    "",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			fields:  fields{
+				ID:     "id",
+				Name:   "john",
+				Avatar: "avatar",
+				Bio:    "",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := UpdateProfileReq{
+				ID:     tt.fields.ID,
+				Name:   tt.fields.Name,
+				Avatar: tt.fields.Avatar,
+				Bio:    tt.fields.Bio,
+			}
+			if err := req.Validate(); (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

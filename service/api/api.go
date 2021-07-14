@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/aeramu/menfess-backend/constants"
 	"github.com/aeramu/menfess-backend/utils"
+	"strings"
 )
 
 type LoginReq struct {
@@ -26,9 +27,14 @@ type RegisterRes struct {
 }
 
 type UpdateProfileReq struct {
+	ID     string
+	Name   string
+	Avatar string
+	Bio    string
 }
 
 type UpdateProfileRes struct {
+	Message string
 }
 
 type GetUserReq struct {
@@ -94,6 +100,17 @@ func (req RegisterReq) Validate() error {
 }
 
 func (req UpdateProfileReq) Validate() error {
+	if req.ID == "" {
+		return constants.ErrInvalidID
+	}
+	req.Name = strings.TrimSpace(req.Name)
+	if req.Name == "" {
+		return constants.ErrInvalidName
+	}
+	req.Avatar = strings.TrimSpace(req.Avatar)
+	if req.Avatar == "" {
+		return constants.ErrInvalidAvatar
+	}
 	return nil
 }
 

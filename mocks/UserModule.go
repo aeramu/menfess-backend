@@ -37,6 +37,29 @@ func (_m *UserModule) FindUserByEmail(ctx context.Context, email string) (*entit
 	return r0, r1
 }
 
+// FindUserByID provides a mock function with given fields: ctx, id
+func (_m *UserModule) FindUserByID(ctx context.Context, id string) (*entity.User, error) {
+	ret := _m.Called(ctx, id)
+
+	var r0 *entity.User
+	if rf, ok := ret.Get(0).(func(context.Context, string) *entity.User); ok {
+		r0 = rf(ctx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entity.User)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // InsertUser provides a mock function with given fields: ctx, user
 func (_m *UserModule) InsertUser(ctx context.Context, user entity.User) (string, error) {
 	ret := _m.Called(ctx, user)
@@ -56,4 +79,18 @@ func (_m *UserModule) InsertUser(ctx context.Context, user entity.User) (string,
 	}
 
 	return r0, r1
+}
+
+// SaveProfile provides a mock function with given fields: ctx, user
+func (_m *UserModule) SaveProfile(ctx context.Context, user entity.User) error {
+	ret := _m.Called(ctx, user)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, entity.User) error); ok {
+		r0 = rf(ctx, user)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }

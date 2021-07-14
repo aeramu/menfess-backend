@@ -20,8 +20,10 @@ type AuthModule interface {
 }
 
 type UserModule interface {
+	FindUserByID(ctx context.Context, id string) (*entity.User, error)
 	FindUserByEmail(ctx context.Context, email string) (*entity.User, error)
 	InsertUser(ctx context.Context, user entity.User) (string, error)
+	SaveProfile(ctx context.Context, user entity.User) error
 }
 
 type PostModule interface {
