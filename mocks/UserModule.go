@@ -14,6 +14,29 @@ type UserModule struct {
 	mock.Mock
 }
 
+// FindMenfessList provides a mock function with given fields: ctx
+func (_m *UserModule) FindMenfessList(ctx context.Context) ([]entity.User, error) {
+	ret := _m.Called(ctx)
+
+	var r0 []entity.User
+	if rf, ok := ret.Get(0).(func(context.Context) []entity.User); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]entity.User)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // FindUserByEmail provides a mock function with given fields: ctx, email
 func (_m *UserModule) FindUserByEmail(ctx context.Context, email string) (*entity.User, error) {
 	ret := _m.Called(ctx, email)

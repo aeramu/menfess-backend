@@ -143,7 +143,13 @@ func (s *service) GetUser(ctx context.Context, req api.GetUserReq) (*api.GetUser
 }
 
 func (s *service) GetMenfessList(ctx context.Context, req api.GetMenfessListReq) (*api.GetMenfessListRes, error) {
-	panic("implement me")
+	menfessList, err := s.adapter.UserModule.FindMenfessList(ctx)
+	if err != nil {
+		s.adapter.LogModule.Log(err, req, "[GetMenfessList] failed get menfess list")
+		return nil, constants.ErrInternalServerError
+	}
+
+	return &api.GetMenfessListRes{MenfessList: menfessList}, nil
 }
 
 func (s *service) GetPost(ctx context.Context, req api.GetPostReq) (*api.GetPostRes, error) {

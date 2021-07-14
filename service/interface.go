@@ -24,6 +24,7 @@ type UserModule interface {
 	FindUserByEmail(ctx context.Context, email string) (*entity.User, error)
 	InsertUser(ctx context.Context, user entity.User) (string, error)
 	SaveProfile(ctx context.Context, user entity.User) error
+	FindMenfessList(ctx context.Context) ([]entity.User, error)
 }
 
 type PostModule interface {

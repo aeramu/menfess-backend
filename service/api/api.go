@@ -50,6 +50,7 @@ type GetMenfessListReq struct {
 }
 
 type GetMenfessListRes struct {
+	MenfessList []entity.User
 }
 
 type GetPostReq struct {

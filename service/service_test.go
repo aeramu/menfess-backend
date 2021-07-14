@@ -577,7 +577,9 @@ func Test_service_GetUser(t *testing.T)  {
 
 func Test_service_GetMenfessList(t *testing.T)  {
 	var (
-
+		ctx = context.Background()
+		req = api.GetMenfessListReq{}
+		err = errors.New("some error")
 	)
 	type args struct {
 		ctx context.Context
@@ -590,7 +592,33 @@ func Test_service_GetMenfessList(t *testing.T)  {
 		want    *api.GetMenfessListRes
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "error when get menfess list",
+			prepare: func() {
+				mockUserModule.On("FindMenfessList", mock.Anything).
+					Return(nil, err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			prepare: func() {
+				mockUserModule.On("FindMenfessList", mock.Anything).
+					Return([]entity.User{}, nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    &api.GetMenfessListRes{MenfessList: []entity.User{}},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
