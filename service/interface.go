@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/aeramu/menfess-backend/entity"
+	"github.com/aeramu/menfess-backend/service/api"
 )
 
 type Adapter struct {
@@ -29,6 +30,12 @@ type UserModule interface {
 
 type PostModule interface {
 	FindPostByID(ctx context.Context, id string, userID string) (*entity.Post, error)
+	FindPostListByParentIDAndAuthorIDs(ctx context.Context,
+		parentID string,
+		authorIDs []string,
+		userID string,
+		pagination api.PaginationReq,
+	) ([]entity.Post, *api.PaginationRes, error)
 }
 
 type NotificationModule interface {

@@ -735,7 +735,21 @@ func Test_service_GetPost(t *testing.T)  {
 
 func Test_service_GetPostList(t *testing.T)  {
 	var (
-
+		ctx = context.Background()
+		err = errors.New("some error")
+		req = api.GetPostListReq{
+			ParentID:   "asdf",
+			AuthorIDs:  []string{"123", "456"},
+			UserID:     "user-id",
+			Pagination: api.PaginationReq{
+				First: 10,
+				After: "1234",
+			},
+		}
+		paginationRes = api.PaginationRes{
+			EndCursor:   "some cursor",
+			HasNextPage: false,
+		}
 	)
 	type args struct {
 		ctx context.Context
@@ -748,7 +762,56 @@ func Test_service_GetPostList(t *testing.T)  {
 		want    *api.GetPostListRes
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "invalid request",
+			prepare: nil,
+			args:    args{
+				ctx: ctx,
+				req: api.GetPostListReq{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when get post list",
+			prepare: func() {
+				mockPostModule.On("FindPostListByParentIDAndAuthorIDs",
+					mock.Anything,
+					req.ParentID,
+					req.AuthorIDs,
+					req.UserID,
+					req.Pagination,
+				).Return(nil, nil, err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			prepare: func() {
+				mockPostModule.On("FindPostListByParentIDAndAuthorIDs",
+					mock.Anything,
+					req.ParentID,
+					req.AuthorIDs,
+					req.UserID,
+					req.Pagination,
+				).Return([]entity.Post{}, &paginationRes, nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    &api.GetPostListRes{
+				PostList:   []entity.Post{},
+				Pagination: paginationRes,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

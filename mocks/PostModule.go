@@ -5,7 +5,10 @@ package mocks
 import (
 	context "context"
 
+	api "github.com/aeramu/menfess-backend/service/api"
+
 	entity "github.com/aeramu/menfess-backend/entity"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -35,4 +38,36 @@ func (_m *PostModule) FindPostByID(ctx context.Context, id string, userID string
 	}
 
 	return r0, r1
+}
+
+// FindPostListByParentIDAndAuthorIDs provides a mock function with given fields: ctx, parentID, authorIDs, userID, pagination
+func (_m *PostModule) FindPostListByParentIDAndAuthorIDs(ctx context.Context, parentID string, authorIDs []string, userID string, pagination api.PaginationReq) ([]entity.Post, *api.PaginationRes, error) {
+	ret := _m.Called(ctx, parentID, authorIDs, userID, pagination)
+
+	var r0 []entity.Post
+	if rf, ok := ret.Get(0).(func(context.Context, string, []string, string, api.PaginationReq) []entity.Post); ok {
+		r0 = rf(ctx, parentID, authorIDs, userID, pagination)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]entity.Post)
+		}
+	}
+
+	var r1 *api.PaginationRes
+	if rf, ok := ret.Get(1).(func(context.Context, string, []string, string, api.PaginationReq) *api.PaginationRes); ok {
+		r1 = rf(ctx, parentID, authorIDs, userID, pagination)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*api.PaginationRes)
+		}
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(context.Context, string, []string, string, api.PaginationReq) error); ok {
+		r2 = rf(ctx, parentID, authorIDs, userID, pagination)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }

@@ -170,7 +170,24 @@ func (s *service) GetPost(ctx context.Context, req api.GetPostReq) (*api.GetPost
 }
 
 func (s *service) GetPostList(ctx context.Context, req api.GetPostListReq) (*api.GetPostListRes, error) {
-	panic("implement me")
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	postList, pagination, err := s.adapter.PostModule.FindPostListByParentIDAndAuthorIDs(ctx,
+		req.ParentID,
+		req.AuthorIDs,
+		req.UserID,
+		req.Pagination)
+	if err != nil {
+		s.adapter.LogModule.Log(err, req, "[GetPostList] failed get post list")
+		return nil, constants.ErrInternalServerError
+	}
+
+	return &api.GetPostListRes{
+		PostList:   postList,
+		Pagination: *pagination,
+	}, nil
 }
 
 func (s *service) CreatePost(ctx context.Context, req api.CreatePostReq) (*api.CreatePostRes, error) {

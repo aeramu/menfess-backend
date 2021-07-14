@@ -333,3 +333,51 @@ func TestGetPostReq_Validate(t *testing.T) {
 		})
 	}
 }
+
+func TestGetPostListReq_Validate(t *testing.T) {
+	type fields struct {
+		ParentID   string
+		AuthorIDs  []string
+		UserID     string
+		Pagination PaginationReq
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		{
+			name:    "empty user id",
+			fields:  fields{
+				ParentID:   "",
+				AuthorIDs:  nil,
+				UserID:     "",
+				Pagination: PaginationReq{},
+			},
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			fields:  fields{
+				ParentID:   "",
+				AuthorIDs:  nil,
+				UserID:     "id",
+				Pagination: PaginationReq{},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := &GetPostListReq{
+				ParentID:   tt.fields.ParentID,
+				AuthorIDs:  tt.fields.AuthorIDs,
+				UserID:     tt.fields.UserID,
+				Pagination: tt.fields.Pagination,
+			}
+			if err := req.Validate(); (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

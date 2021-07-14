@@ -63,9 +63,15 @@ type GetPostRes struct {
 }
 
 type GetPostListReq struct {
+	ParentID   string
+	AuthorIDs  []string
+	UserID     string
+	Pagination PaginationReq
 }
 
 type GetPostListRes struct {
+	PostList   []entity.Post
+	Pagination PaginationRes
 }
 
 type CreatePostReq struct {
@@ -78,6 +84,16 @@ type LikePostReq struct {
 }
 
 type LikePostRes struct {
+}
+
+type PaginationReq struct {
+	First int
+	After string
+}
+
+type PaginationRes struct {
+	EndCursor   string
+	HasNextPage bool
 }
 
 func (req LoginReq) Validate() error {
@@ -106,7 +122,7 @@ func (req RegisterReq) Validate() error {
 	return nil
 }
 
-func (req UpdateProfileReq) Validate() error {
+func (req *UpdateProfileReq) Validate() error {
 	if req.ID == "" {
 		return constants.ErrInvalidID
 	}
@@ -140,10 +156,15 @@ func (req GetPostReq) Validate() error {
 		return constants.ErrInvalidUserID
 	}
 	return nil
-	return nil
 }
 
-func (req GetPostListReq) Validate() error {
+func (req *GetPostListReq) Validate() error {
+	if req.UserID == "" {
+		return constants.ErrInvalidUserID
+	}
+	if req.Pagination.First < 1 {
+		req.Pagination.First = 20
+	}
 	return nil
 }
 
