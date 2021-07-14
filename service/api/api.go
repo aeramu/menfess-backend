@@ -54,9 +54,12 @@ type GetMenfessListRes struct {
 }
 
 type GetPostReq struct {
+	ID     string
+	UserID string
 }
 
 type GetPostRes struct {
+	Post entity.Post
 }
 
 type GetPostListReq struct {
@@ -130,6 +133,13 @@ func (req GetMenfessListReq) Validate() error {
 }
 
 func (req GetPostReq) Validate() error {
+	if req.ID == "" {
+		return constants.ErrInvalidID
+	}
+	if req.UserID == "" {
+		return constants.ErrInvalidUserID
+	}
+	return nil
 	return nil
 }
 

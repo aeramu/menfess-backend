@@ -643,7 +643,12 @@ func Test_service_GetMenfessList(t *testing.T)  {
 
 func Test_service_GetPost(t *testing.T)  {
 	var (
-
+		ctx = context.Background()
+		req = api.GetPostReq{
+			ID:     "id",
+			UserID: "user-id",
+		}
+		err = errors.New("some error")
 	)
 	type args struct {
 		ctx context.Context
@@ -656,7 +661,56 @@ func Test_service_GetPost(t *testing.T)  {
 		want    *api.GetPostRes
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "invalid request",
+			prepare: nil,
+			args:    args{
+				ctx: ctx,
+				req: api.GetPostReq{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when get post",
+			prepare: func() {
+				mockPostModule.On("FindPostByID", mock.Anything, req.ID, req.UserID).
+					Return(nil, err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error post not found",
+			prepare: func() {
+				mockPostModule.On("FindPostByID", mock.Anything, req.ID, req.UserID).
+					Return(nil, constants.ErrPostNotFound)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			prepare: func() {
+				mockPostModule.On("FindPostByID", mock.Anything, req.ID, req.UserID).
+					Return(&entity.Post{}, nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    &api.GetPostRes{Post: entity.Post{}},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

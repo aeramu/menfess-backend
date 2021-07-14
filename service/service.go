@@ -153,7 +153,20 @@ func (s *service) GetMenfessList(ctx context.Context, req api.GetMenfessListReq)
 }
 
 func (s *service) GetPost(ctx context.Context, req api.GetPostReq) (*api.GetPostRes, error) {
-	panic("implement me")
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	post, err := s.adapter.PostModule.FindPostByID(ctx, req.ID, req.UserID)
+	if err != nil {
+		if err == constants.ErrPostNotFound {
+			return nil, constants.ErrPostNotFound
+		}
+		s.adapter.LogModule.Log(err, req, "[GetPost] failed get post")
+		return nil, constants.ErrInternalServerError
+	}
+
+	return &api.GetPostRes{Post: *post}, nil
 }
 
 func (s *service) GetPostList(ctx context.Context, req api.GetPostListReq) (*api.GetPostListRes, error) {

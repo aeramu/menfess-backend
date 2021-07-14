@@ -285,3 +285,51 @@ func TestGetMenfessListReq_Validate(t *testing.T) {
 		})
 	}
 }
+
+func TestGetPostReq_Validate(t *testing.T) {
+	type fields struct {
+		ID     string
+		UserID string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		{
+			name:    "empty id",
+			fields:  fields{
+				ID:     "",
+				UserID: "",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "empty user id",
+			fields:  fields{
+				ID:     "id",
+				UserID: "",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			fields:  fields{
+				ID:     "id",
+				UserID: "user-id",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := GetPostReq{
+				ID:     tt.fields.ID,
+				UserID: tt.fields.UserID,
+			}
+			if err := req.Validate(); (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

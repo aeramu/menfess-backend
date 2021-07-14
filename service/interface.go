@@ -28,6 +28,7 @@ type UserModule interface {
 }
 
 type PostModule interface {
+	FindPostByID(ctx context.Context, id string, userID string) (*entity.Post, error)
 }
 
 type NotificationModule interface {
