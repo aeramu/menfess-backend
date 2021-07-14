@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/aeramu/menfess-backend/constants"
+	"github.com/aeramu/menfess-backend/entity"
 	"github.com/aeramu/menfess-backend/utils"
 	"strings"
 )
@@ -38,9 +39,11 @@ type UpdateProfileRes struct {
 }
 
 type GetUserReq struct {
+	ID string
 }
 
 type GetUserRes struct {
+	User entity.User
 }
 
 type GetMenfessListReq struct {
@@ -115,6 +118,9 @@ func (req UpdateProfileReq) Validate() error {
 }
 
 func (req GetUserReq) Validate() error {
+	if req.ID == "" {
+		return constants.ErrInvalidID
+	}
 	return nil
 }
 

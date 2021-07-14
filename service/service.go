@@ -129,7 +129,17 @@ func (s *service) UpdateProfile(ctx context.Context, req api.UpdateProfileReq) (
 }
 
 func (s *service) GetUser(ctx context.Context, req api.GetUserReq) (*api.GetUserRes, error) {
-	panic("implement me")
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	user, err := s.adapter.UserModule.FindUserByID(ctx, req.ID)
+	if err != nil {
+		s.adapter.LogModule.Log(err, req, "[GetUser] failed get user")
+		return nil, constants.ErrInternalServerError
+	}
+
+	return &api.GetUserRes{User: *user}, nil
 }
 
 func (s *service) GetMenfessList(ctx context.Context, req api.GetMenfessListReq) (*api.GetMenfessListRes, error) {

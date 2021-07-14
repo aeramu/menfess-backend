@@ -491,7 +491,19 @@ func Test_service_UpdateProfile(t *testing.T)  {
 
 func Test_service_GetUser(t *testing.T)  {
 	var (
-
+		ctx = context.Background()
+		req = api.GetUserReq{
+			ID: "id",
+		}
+		err = errors.New("some error")
+		user = entity.User{
+			ID:      "id",
+			Profile: entity.Profile{
+				Name: "john",
+				Avatar: "avatar",
+				Bio: "",
+			},
+		}
 	)
 	type args struct {
 		ctx context.Context
@@ -504,7 +516,43 @@ func Test_service_GetUser(t *testing.T)  {
 		want    *api.GetUserRes
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "invalid request",
+			prepare: nil,
+			args:    args{
+				ctx: ctx,
+				req: api.GetUserReq{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when get user",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.ID).
+					Return(nil, err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.ID).
+					Return(&user, nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    &api.GetUserRes{User: user},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
