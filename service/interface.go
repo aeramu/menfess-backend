@@ -36,6 +36,7 @@ type PostModule interface {
 		userID string,
 		pagination api.PaginationReq,
 	) ([]entity.Post, *api.PaginationRes, error)
+	SavePost(ctx context.Context, post entity.Post) error
 }
 
 type NotificationModule interface {

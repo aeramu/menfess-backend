@@ -24,6 +24,7 @@ type Post struct {
 	RepliesCount int
 	LikesCount   int
 	IsLiked      bool
-	Author       User
+	Parent       *Post
+	Author       *User
 	User         User
 }

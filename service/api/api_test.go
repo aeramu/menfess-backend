@@ -381,3 +381,61 @@ func TestGetPostListReq_Validate(t *testing.T) {
 		})
 	}
 }
+
+func TestCreatePostReq_Validate(t *testing.T) {
+	type fields struct {
+		Body     string
+		UserID   string
+		AuthorID string
+		ParentID string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		{
+			name:    "empty body",
+			fields:  fields{
+				Body:     "",
+				UserID:   "user-id",
+				AuthorID: "author-id",
+				ParentID: "parent-id",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "empty user id",
+			fields:  fields{
+				Body:     "body",
+				UserID:   "",
+				AuthorID: "author-id",
+				ParentID: "parent-id",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			fields:  fields{
+				Body:     "body",
+				UserID:   "user-id",
+				AuthorID: "author-id",
+				ParentID: "parent-id",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := CreatePostReq{
+				Body:     tt.fields.Body,
+				UserID:   tt.fields.UserID,
+				AuthorID: tt.fields.AuthorID,
+				ParentID: tt.fields.ParentID,
+			}
+			if err := req.Validate(); (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

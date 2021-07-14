@@ -17,4 +17,5 @@ var (
 	ErrInvalidAvatar = errors.New("avatar is not valid")
 
 	ErrPostNotFound = errors.New("post not found")
+	ErrInvalidBody = errors.New("body is not valid")
 )

@@ -75,9 +75,14 @@ type GetPostListRes struct {
 }
 
 type CreatePostReq struct {
+	Body     string
+	UserID   string
+	AuthorID string
+	ParentID string
 }
 
 type CreatePostRes struct {
+	Message string
 }
 
 type LikePostReq struct {
@@ -169,6 +174,12 @@ func (req *GetPostListReq) Validate() error {
 }
 
 func (req CreatePostReq) Validate() error {
+	if req.Body == "" {
+		return constants.ErrInvalidBody
+	}
+	if req.UserID == "" {
+		return constants.ErrInvalidUserID
+	}
 	return nil
 }
 

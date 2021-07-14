@@ -191,7 +191,31 @@ func (s *service) GetPostList(ctx context.Context, req api.GetPostListReq) (*api
 }
 
 func (s *service) CreatePost(ctx context.Context, req api.CreatePostReq) (*api.CreatePostRes, error) {
-	panic("implement me")
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	if _, err := s.adapter.UserModule.FindUserByID(ctx, req.UserID); err != nil {
+		if err == constants.ErrUserNotFound {
+			return nil, constants.ErrUserNotFound
+		}
+		s.adapter.LogModule.Log(err, req, "[CreatePost] failed get user")
+		return nil, constants.ErrInternalServerError
+	}
+
+	if err := s.adapter.PostModule.SavePost(ctx, entity.Post{
+		Body:         req.Body,
+		RepliesCount: 0,
+		LikesCount:   0,
+		Parent:       &entity.Post{ID: req.ParentID},
+		Author:       &entity.User{ID: req.AuthorID},
+		User:         entity.User{ID: req.UserID},
+	}); err != nil {
+		s.adapter.LogModule.Log(err, req, "[CreatePost] failed save post")
+		return nil, constants.ErrInternalServerError
+	}
+
+	return &api.CreatePostRes{Message: "success"}, nil
 }
 
 func (s *service) LikePost(ctx context.Context, req api.LikePostReq) (*api.LikePostRes, error) {

@@ -836,7 +836,14 @@ func Test_service_GetPostList(t *testing.T)  {
 
 func Test_service_CreatePost(t *testing.T)  {
 	var (
-
+		ctx = context.Background()
+		err = errors.New("some error")
+		req = api.CreatePostReq{
+			Body:     "body",
+			UserID:   "user-id",
+			AuthorID: "author-id",
+			ParentID: "parent-id",
+		}
 	)
 	type args struct {
 		ctx context.Context
@@ -849,7 +856,79 @@ func Test_service_CreatePost(t *testing.T)  {
 		want    *api.CreatePostRes
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "invalid request",
+			prepare: nil,
+			args:    args{
+				ctx: ctx,
+				req: api.CreatePostReq{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when get user from db",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(nil, err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when user not found",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(nil, constants.ErrUserNotFound)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when save post",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(&entity.User{}, nil)
+				mockPostModule.On("SavePost", mock.Anything, mock.Anything).
+					Return(err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(&entity.User{}, nil)
+				mockPostModule.On("SavePost", mock.Anything, mock.MatchedBy(func(p entity.Post) bool {
+					assert.Equal(t, req.Body, p.Body)
+					assert.Equal(t, req.AuthorID, p.Author.ID)
+					assert.Equal(t, req.ParentID, p.Parent.ID)
+					assert.Equal(t, req.UserID, p.User.ID)
+					return true
+				})).Return(nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    &api.CreatePostRes{Message: "success"},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
