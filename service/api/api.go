@@ -86,9 +86,12 @@ type CreatePostRes struct {
 }
 
 type LikePostReq struct {
+	PostID string
+	UserID string
 }
 
 type LikePostRes struct {
+	Message string
 }
 
 type PaginationReq struct {
@@ -184,5 +187,11 @@ func (req CreatePostReq) Validate() error {
 }
 
 func (req LikePostReq) Validate() error {
+	if req.PostID == "" {
+		return constants.ErrInvalidPostID
+	}
+	if req.UserID == "" {
+		return constants.ErrInvalidUserID
+	}
 	return nil
 }

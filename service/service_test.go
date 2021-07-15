@@ -953,7 +953,23 @@ func Test_service_CreatePost(t *testing.T)  {
 
 func Test_service_LikePost(t *testing.T)  {
 	var (
-
+		ctx = context.Background()
+		err = errors.New("some error")
+		req = api.LikePostReq{
+			PostID: "post-id",
+			UserID: "user-id",
+		}
+		post = entity.Post{
+			ID:      "post-id",
+			IsLiked: false,
+			User:    entity.User{ID: "user-post-id"},
+		}
+		user = entity.User{
+			ID:      "id",
+			Profile: entity.Profile{
+				Name: "John",
+			},
+		}
 	)
 	type args struct {
 		ctx context.Context
@@ -966,7 +982,153 @@ func Test_service_LikePost(t *testing.T)  {
 		want    *api.LikePostRes
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "invalid request",
+			prepare: nil,
+			args:    args{
+				ctx: ctx,
+				req: api.LikePostReq{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when get user",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(nil, err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error user not found",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(nil, constants.ErrUserNotFound)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when get post",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(&entity.User{}, nil)
+				mockPostModule.On("FindPostByID", mock.Anything, req.PostID, req.UserID).
+					Return(nil, err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error post not found",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(&entity.User{}, nil)
+				mockPostModule.On("FindPostByID", mock.Anything, req.PostID, req.UserID).
+					Return(nil, constants.ErrPostNotFound)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when like post",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(&entity.User{}, nil)
+				mockPostModule.On("FindPostByID", mock.Anything, req.PostID, req.UserID).
+					Return(&post, nil)
+				mockPostModule.On("LikePost", mock.Anything, req.PostID, req.UserID).
+					Return(err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when unlike post",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(&entity.User{}, nil)
+				mockPostModule.On("FindPostByID", mock.Anything, req.PostID, req.UserID).
+					Return(&entity.Post{IsLiked: true}, nil)
+				mockPostModule.On("UnlikePost", mock.Anything, req.PostID, req.UserID).
+					Return(err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when send notification",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(&user, nil)
+				mockPostModule.On("FindPostByID", mock.Anything, req.PostID, req.UserID).
+					Return(&post, nil)
+				mockPostModule.On("LikePost", mock.Anything, req.PostID, req.UserID).
+					Return(nil)
+				mockNotificationModule.On("SendLikeNotification", mock.Anything,
+					user,
+					post,
+				).Return(err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    &api.LikePostRes{Message: "success"},
+			wantErr: false,
+		},
+		{
+			name:    "success like post",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(&user, nil)
+				mockPostModule.On("FindPostByID", mock.Anything, req.PostID, req.UserID).
+					Return(&post, nil)
+				mockPostModule.On("LikePost", mock.Anything, req.PostID, req.UserID).
+					Return(nil)
+				mockNotificationModule.On("SendLikeNotification", mock.Anything,
+					user,
+					post,
+				).Return(nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    &api.LikePostRes{Message: "success"},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

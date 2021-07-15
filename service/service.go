@@ -219,5 +219,42 @@ func (s *service) CreatePost(ctx context.Context, req api.CreatePostReq) (*api.C
 }
 
 func (s *service) LikePost(ctx context.Context, req api.LikePostReq) (*api.LikePostRes, error) {
-	panic("implement me")
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	user, err := s.adapter.UserModule.FindUserByID(ctx, req.UserID);
+	if err != nil {
+		if err == constants.ErrUserNotFound {
+			return nil, constants.ErrUserNotFound
+		}
+		s.adapter.LogModule.Log(err, req, "[LikePost] failed get user")
+		return nil, constants.ErrInternalServerError
+	}
+
+	post, err := s.adapter.PostModule.FindPostByID(ctx, req.PostID, req.UserID)
+	if err != nil {
+		if err == constants.ErrPostNotFound {
+			return nil, constants.ErrPostNotFound
+		}
+		s.adapter.LogModule.Log(err, req, "[LikePost] failed get post")
+		return nil, constants.ErrInternalServerError
+	}
+
+	if post.IsLiked {
+		if err := s.adapter.PostModule.UnlikePost(ctx, req.PostID, req.UserID); err != nil {
+			s.adapter.LogModule.Log(err, req, "[LikePost] failed unlike post")
+			return nil, constants.ErrInternalServerError
+		}
+	} else {
+		if err := s.adapter.PostModule.LikePost(ctx, req.PostID, req.UserID); err != nil {
+			s.adapter.LogModule.Log(err, req, "[LikePost] failed like post")
+			return nil, constants.ErrInternalServerError
+		}
+		if err := s.adapter.NotificationModule.SendLikeNotification(ctx, *user, *post); err != nil {
+			s.adapter.LogModule.Log(err, req, "[LikePost] failed send notification")
+		}
+	}
+
+	return &api.LikePostRes{Message: "success"}, nil
 }

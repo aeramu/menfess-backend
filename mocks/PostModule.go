@@ -72,6 +72,20 @@ func (_m *PostModule) FindPostListByParentIDAndAuthorIDs(ctx context.Context, pa
 	return r0, r1, r2
 }
 
+// LikePost provides a mock function with given fields: ctx, postID, userID
+func (_m *PostModule) LikePost(ctx context.Context, postID string, userID string) error {
+	ret := _m.Called(ctx, postID, userID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
+		r0 = rf(ctx, postID, userID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // SavePost provides a mock function with given fields: ctx, post
 func (_m *PostModule) SavePost(ctx context.Context, post entity.Post) error {
 	ret := _m.Called(ctx, post)
@@ -79,6 +93,20 @@ func (_m *PostModule) SavePost(ctx context.Context, post entity.Post) error {
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, entity.Post) error); ok {
 		r0 = rf(ctx, post)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UnlikePost provides a mock function with given fields: ctx, postID, userID
+func (_m *PostModule) UnlikePost(ctx context.Context, postID string, userID string) error {
+	ret := _m.Called(ctx, postID, userID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
+		r0 = rf(ctx, postID, userID)
 	} else {
 		r0 = ret.Error(0)
 	}

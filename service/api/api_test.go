@@ -43,7 +43,7 @@ func TestLoginReq_Validate(t *testing.T) {
 		{
 			name:    "empty password",
 			fields:  fields{
-				Email:     "sulam3010gmail.com",
+				Email:     "sulam3010@gmail.com",
 				Password:  "",
 				PushToken: "sadf1234fas",
 			},
@@ -52,7 +52,7 @@ func TestLoginReq_Validate(t *testing.T) {
 		{
 			name:    "empty push token",
 			fields:  fields{
-				Email:     "sulam3010gmail.com",
+				Email:     "sulam3010@gmail.com",
 				Password:  "password",
 				PushToken: "",
 			},
@@ -114,7 +114,7 @@ func TestRegisterReq_Validate(t *testing.T) {
 		{
 			name:    "empty password",
 			fields:  fields{
-				Email:     "sulam3010gmail.com",
+				Email:     "sulam3010@gmail.com",
 				Password:  "",
 				PushToken: "sadf1234fas",
 			},
@@ -123,7 +123,7 @@ func TestRegisterReq_Validate(t *testing.T) {
 		{
 			name:    "empty push token",
 			fields:  fields{
-				Email:     "sulam3010gmail.com",
+				Email:     "sulam3010@gmail.com",
 				Password:  "password",
 				PushToken: "",
 			},
@@ -432,6 +432,54 @@ func TestCreatePostReq_Validate(t *testing.T) {
 				UserID:   tt.fields.UserID,
 				AuthorID: tt.fields.AuthorID,
 				ParentID: tt.fields.ParentID,
+			}
+			if err := req.Validate(); (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestLikePostReq_Validate(t *testing.T) {
+	type fields struct {
+		PostID string
+		UserID string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		{
+			name:    "empty post id",
+			fields:  fields{
+				PostID: "",
+				UserID: "user-id",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "empty user id",
+			fields:  fields{
+				PostID: "post-id",
+				UserID: "",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "empty post id",
+			fields:  fields{
+				PostID: "post-id",
+				UserID: "user-id",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := LikePostReq{
+				PostID: tt.fields.PostID,
+				UserID: tt.fields.UserID,
 			}
 			if err := req.Validate(); (err != nil) != tt.wantErr {
 				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
