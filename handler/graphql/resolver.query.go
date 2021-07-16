@@ -23,20 +23,7 @@ func (r *Resolver) Post(ctx context.Context, input struct{
 		return PostResponse{Error: Error(err)}
 	}
 	return PostResponse{
-		Payload: Post{
-			ID:           graphql.ID(res.Post.ID),
-			Body:         res.Post.Body,
-			Timestamp:    int32(res.Post.Timestamp),
-			Author:       User{
-				ID:     graphql.ID(res.Post.Author.ID),
-				Name:   res.Post.Author.Profile.Name,
-				Avatar: res.Post.Author.Profile.Avatar,
-				Bio:    res.Post.Author.Profile.Bio,
-			},
-			LikesCount:   int32(res.Post.LikesCount),
-			RepliesCount: int32(res.Post.RepliesCount),
-			IsLiked:      res.Post.IsLiked,
-		},
+		Payload: ResolvePost(res.Post),
 		Error:   NoError,
 	}
 }
@@ -52,21 +39,22 @@ func (r *Resolver) Posts(ctx context.Context, input struct{
 			Error:   Error(err),
 		}
 	}
-	res, err := r.svc.GetPostList(ctx, api.GetPostListReq{
-		ParentID:   "",
-		AuthorIDs:  nil,
+	req := api.GetPostListReq{
 		UserID:     token.UserID,
 		Pagination: api.PaginationReq{
 			First: input.First,
-			After: "",
 		},
-	})
+	}
+	if input.After != nil {
+		req.Pagination.After = string(*input.After)
+	}
+	res, err := r.svc.GetPostList(ctx, req)
 	if err != nil {
 		return PostsResponse{Error: Error(err)}
 	}
 	return PostsResponse{
 		Payload: PostConnection{
-			Edges:    nil,
+			Edges:    ResolvePostEdges(res.PostList),
 			PageInfo: PageInfo{
 				EndCursor:   graphql.ID(res.Pagination.EndCursor),
 				HasNextPage: res.Pagination.HasNextPage,
@@ -101,12 +89,14 @@ func (r *Resolver) Me(ctx context.Context) MeResponse {
 }
 
 func (r *Resolver) Menfess(ctx context.Context) MenfessResponse {
-	_, err := r.svc.GetMenfessList(ctx, api.GetMenfessListReq{})
+	res, err := r.svc.GetMenfessList(ctx, api.GetMenfessListReq{})
 	if err != nil {
 		return MenfessResponse{Error: Error(err)}
 	}
 	return MenfessResponse{
-		Payload: UserConnection{},
+		Payload: UserConnection{
+			Edges: ResolveUserEdges(res.MenfessList),
+		},
 		Error:   NoError,
 	}
 }

@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"context"
+	"github.com/aeramu/menfess-backend/entity"
 	"github.com/graph-gophers/graphql-go"
 )
 
@@ -20,6 +21,26 @@ type UserEdge struct {
 type UserConnection struct {
 	Edges    []UserEdge
 	PageInfo PageInfo
+}
+
+func ResolveUser(user entity.User) User {
+	return User{
+		ID:     graphql.ID(user.ID),
+		Name:   user.Profile.Name,
+		Avatar: user.Profile.Avatar,
+		Bio:    user.Profile.Bio,
+	}
+}
+
+func ResolveUserEdges(posts []entity.User) []UserEdge {
+	var edges []UserEdge
+	for _, v := range posts {
+		edges = append(edges, UserEdge{
+			Node:   ResolveUser(v),
+			Cursor: graphql.ID(v.ID),
+		})
+	}
+	return edges
 }
 
 type Post struct {
@@ -47,6 +68,29 @@ type PostEdge struct {
 type PostConnection struct {
 	Edges    []PostEdge
 	PageInfo PageInfo
+}
+
+func ResolvePost(post entity.Post) Post {
+	return Post{
+		ID:           graphql.ID(post.ID),
+		Body:         post.Body,
+		Timestamp:    int32(post.Timestamp),
+		Author:       ResolveUser(post.Author),
+		LikesCount:   int32(post.LikesCount),
+		RepliesCount: int32(post.RepliesCount),
+		IsLiked:      post.IsLiked,
+	}
+}
+
+func ResolvePostEdges(posts []entity.Post) []PostEdge {
+	var edges []PostEdge
+	for _, v := range posts {
+		edges = append(edges, PostEdge{
+			Node:   ResolvePost(v),
+			Cursor: graphql.ID(v.ID),
+		})
+	}
+	return edges
 }
 
 type PageInfo struct {
