@@ -38,23 +38,27 @@ func (m *postModule) FindPostByID(ctx context.Context, id string, userID string)
 
 func (m *postModule) FindPostListByParentIDAndAuthorIDs(ctx context.Context, parentID string, authorIDs []string, userID string, pagination api.PaginationReq) ([]entity.Post, *api.PaginationRes, error) {
 	var model AggregatePostList
+	if pagination.After == "" {
+		pagination.After = "ffffffffffffffffffffffff"
+	}
 	if err := m.post.Aggregate().
 		Match(mongolib.Filter().
 			Equal("parent_id", mongolib.ObjectID(parentID)).
-			// TODO: Need fixing
-			In("author_id", authorIDs).
+			// TODO: Need fixing filter author ids
+			//In("author_id", authorIDs).
 			LessThan("_id", mongolib.ObjectID(pagination.After))).
 		Sort("_id", mongolib.Descending).
 		Limit(pagination.First).
 		Lookup("user", "author_id", "_id", "author").
+		Unwind("$author").
 		Lookup("user", "user_id", "_id", "user").
+		Unwind("$user").
 		Exec(ctx).Consume(&model);
 		err != nil {
 		return nil, nil, err
 	}
 
 	return model.Entity(userID), &api.PaginationRes{
-		EndCursor:   model[len(model)-1].ID.Hex(),
 		HasNextPage: len(model) >= pagination.First,
 	}, nil
 }

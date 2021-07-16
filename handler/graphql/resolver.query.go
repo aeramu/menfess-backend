@@ -29,7 +29,7 @@ func (r *Resolver) Post(ctx context.Context, input struct{
 }
 
 func (r *Resolver) Posts(ctx context.Context, input struct{
-	First int
+	First int32
 	After *graphql.ID
 	Filter *[]graphql.ID
 }) PostsResponse {
@@ -42,7 +42,7 @@ func (r *Resolver) Posts(ctx context.Context, input struct{
 	req := api.GetPostListReq{
 		UserID:     token.UserID,
 		Pagination: api.PaginationReq{
-			First: input.First,
+			First: int(input.First),
 		},
 	}
 	if input.After != nil {
