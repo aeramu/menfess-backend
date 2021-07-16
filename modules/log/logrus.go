@@ -1,6 +1,13 @@
 package log
 
-import loglib "github.com/sirupsen/logrus"
+import (
+	"github.com/aeramu/menfess-backend/service"
+	loglib "github.com/sirupsen/logrus"
+)
+
+func NewLogModule() service.LogModule {
+	return &logModule{}
+}
 
 type logModule struct {}
 

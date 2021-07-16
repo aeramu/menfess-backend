@@ -13,7 +13,7 @@ import (
 )
 
 func NewServer(svc service.Service) (*server, error) {
-	f, err := os.Open("api/graphql/schema.graphql")
+	f, err := os.Open("schema.graphql")
 	if err != nil {
 		return nil, err
 	}

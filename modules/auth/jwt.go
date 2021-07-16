@@ -4,9 +4,14 @@ import (
 	"context"
 	"errors"
 	"github.com/aeramu/menfess-backend/entity"
+	"github.com/aeramu/menfess-backend/service"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 )
+
+func NewAuthModule() service.AuthModule {
+	return &AuthModule{}
+}
 
 type AuthModule struct {
 
