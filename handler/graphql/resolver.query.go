@@ -25,7 +25,7 @@ func (r *Resolver) Post(ctx context.Context, input struct{
 	return PostResponse{
 		Payload: Post{
 			ID:           graphql.ID(res.Post.ID),
-			Body:         res.Post.ID,
+			Body:         res.Post.Body,
 			Timestamp:    int32(res.Post.Timestamp),
 			Author:       User{
 				ID:     graphql.ID(res.Post.Author.ID),

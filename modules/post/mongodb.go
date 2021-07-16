@@ -21,9 +21,11 @@ type postModule struct {
 func (m *postModule) FindPostByID(ctx context.Context, id string, userID string) (*entity.Post, error) {
 	var model AggregatePostList
 	if err := m.post.Aggregate().
-		Match(mongolib.Filter{}.Equal("_id", mongolib.ObjectID(id))).
+		Match(mongolib.Filter().Equal("_id", mongolib.ObjectID(id))).
 		Lookup("user", "author_id", "_id", "author").
+		Unwind("$author").
 		Lookup("user", "user_id", "_id", "user").
+		Unwind("$user").
 		Exec(ctx).Consume(&model);
 	err != nil {
 		return nil, err
@@ -37,7 +39,7 @@ func (m *postModule) FindPostByID(ctx context.Context, id string, userID string)
 func (m *postModule) FindPostListByParentIDAndAuthorIDs(ctx context.Context, parentID string, authorIDs []string, userID string, pagination api.PaginationReq) ([]entity.Post, *api.PaginationRes, error) {
 	var model AggregatePostList
 	if err := m.post.Aggregate().
-		Match(mongolib.Filter{}.
+		Match(mongolib.Filter().
 			Equal("parent_id", mongolib.ObjectID(parentID)).
 			// TODO: Need fixing
 			In("author_id", authorIDs).

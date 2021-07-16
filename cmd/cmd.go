@@ -16,7 +16,7 @@ import (
 )
 
 func Run() {
-	client, err := mongolib.NewSingletonClient(context.Background(), "")
+	client, err := mongolib.NewSingletonClient(context.Background(), "mongodb+srv://admin:admin@qiup-wrbox.mongodb.net")
 	if err != nil {
 		log.Fatalln("[Init DB Client]", err)
 	}
