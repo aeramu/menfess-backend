@@ -8,7 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type authModule struct {
+type AuthModule struct {
 
 }
 
@@ -19,7 +19,7 @@ type Claims struct {
 
 var key = []byte("menfess")
 
-func (m *authModule) GenerateToken(ctx context.Context, user entity.User) (string, error) {
+func (m *AuthModule) GenerateToken(ctx context.Context, user entity.User) (string, error) {
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
 		UserID: user.ID,
 	}).SignedString(key)
@@ -43,11 +43,11 @@ func DecodeToken(ctx context.Context, tokenString string) (*Claims, error) {
 	return &claims, nil
 }
 
-func (m *authModule) ComparePassword(ctx context.Context, hash string, password string) error {
+func (m *AuthModule) ComparePassword(ctx context.Context, hash string, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 }
 
-func (m *authModule) HashPassword(ctx context.Context, password string) (string, error) {
+func (m *AuthModule) HashPassword(ctx context.Context, password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err

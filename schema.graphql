@@ -1,0 +1,103 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Mutation {
+    """ Auth """
+    login(email: String!, passsword: String!, pushToken: String!): AuthResponse!
+    register(email: String!, passsword: String!, pushToken: String!): AuthResponse!
+
+    """ Profile """
+    updateProfile(name: String!, avatar: String!, bio: String!): BasicMutationResponse!
+
+    """ Post """
+    createPost(body: String!, authorID: ID, parentID: ID): BasicMutationResponse!
+    likePost(id: ID!): BasicMutationResponse!
+}
+
+type Query {
+    """ Post """
+    posts(first: Int!, after: ID, filter:[ID!]): PostsResponse!
+    post(id: ID!): PostResponse!
+    menfess: MenfessResponse!
+
+    me: MeResponse!
+}
+
+type Error {
+    isError: Boolean!
+    message: String!
+}
+
+type AuthResponse {
+    token: String!
+    error: Error!
+}
+
+type BasicMutationResponse {
+    error: Error!
+}
+
+type PostsResponse {
+    payload: PostConnection!
+    error: Error!
+}
+
+type PostResponse {
+    payload: Post!
+    error: Error!
+}
+
+type MeResponse {
+    payload: User!
+    error: Error!
+}
+
+type MenfessResponse {
+    payload: UserConnection!
+    error: Error!
+}
+
+type Post {
+    id: ID!
+    body: String!
+    timestamp: Int!
+    author: User!
+    likesCount: Int!
+    isLiked: Boolean!
+    repliesCount: Int!
+    replies(first: Int!, after: ID): PostConnection!
+}
+
+type PostConnection {
+    edges: [PostEdge!]!
+    pageInfo: PageInfo!
+}
+
+type PostEdge {
+    node: Post!
+    cursor: ID!
+}
+
+type User {
+    id: ID!
+    name: String!
+    avatar: String!
+    bio: String!
+}
+
+type UserConnection {
+    edges: [UserEdge!]!
+    pageInfo: PageInfo!
+}
+
+type UserEdge {
+    node: User!
+    cursor: ID!
+}
+
+type PageInfo {
+    endCursor: ID!
+    hasNextPage: Boolean!
+}
