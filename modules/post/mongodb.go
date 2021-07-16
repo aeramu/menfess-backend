@@ -4,10 +4,15 @@ import (
 	"context"
 	"github.com/aeramu/menfess-backend/constants"
 	"github.com/aeramu/menfess-backend/entity"
+	"github.com/aeramu/menfess-backend/service"
 	"github.com/aeramu/menfess-backend/service/api"
 	"github.com/aeramu/mongolib"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+func NewPostModule(db *mongolib.Database) service.PostModule {
+	return &postModule{post: db.Coll("post")}
+}
 
 type postModule struct {
 	post *mongolib.Collection
