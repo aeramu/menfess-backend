@@ -1,6 +1,9 @@
 package graphql
 
-import "github.com/graph-gophers/graphql-go"
+import (
+	"context"
+	"github.com/graph-gophers/graphql-go"
+)
 
 type User struct {
 	ID     graphql.ID
@@ -22,11 +25,18 @@ type UserConnection struct {
 type Post struct {
 	ID           graphql.ID
 	Body         string
-	Timestamp    int
+	Timestamp    int32
 	Author       User
-	LikesCount   int
-	RepliesCount int
+	LikesCount   int32
+	RepliesCount int32
 	IsLiked      bool
+}
+
+func (p Post) Replies(ctx context.Context, input struct{
+	First int
+	After *graphql.ID
+}) PostConnection {
+	return PostConnection{}
 }
 
 type PostEdge struct {

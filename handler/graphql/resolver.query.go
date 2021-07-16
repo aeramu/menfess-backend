@@ -26,15 +26,15 @@ func (r *Resolver) Post(ctx context.Context, input struct{
 		Payload: Post{
 			ID:           graphql.ID(res.Post.ID),
 			Body:         res.Post.ID,
-			Timestamp:    int(res.Post.Timestamp),
+			Timestamp:    int32(res.Post.Timestamp),
 			Author:       User{
 				ID:     graphql.ID(res.Post.Author.ID),
 				Name:   res.Post.Author.Profile.Name,
 				Avatar: res.Post.Author.Profile.Avatar,
 				Bio:    res.Post.Author.Profile.Bio,
 			},
-			LikesCount:   res.Post.LikesCount,
-			RepliesCount: res.Post.RepliesCount,
+			LikesCount:   int32(res.Post.LikesCount),
+			RepliesCount: int32(res.Post.RepliesCount),
 			IsLiked:      res.Post.IsLiked,
 		},
 		Error:   NoError,
@@ -44,7 +44,7 @@ func (r *Resolver) Post(ctx context.Context, input struct{
 func (r *Resolver) Posts(ctx context.Context, input struct{
 	First int
 	After *graphql.ID
-	Filter []graphql.ID
+	Filter *[]graphql.ID
 }) PostsResponse {
 	token, err := DecodeToken(ctx)
 	if err != nil {
