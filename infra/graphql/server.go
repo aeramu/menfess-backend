@@ -23,7 +23,7 @@ func NewServer(svc service.Service) (*server, error) {
 		return nil, err
 	}
 
-	schema, err := graphql.ParseSchema(string(b), handler.NewResolver(svc))
+	schema, err := graphql.ParseSchema(string(b), handler.NewResolver(svc), graphql.UseFieldResolvers())
 	if err != nil {
 		return nil, err
 	}
