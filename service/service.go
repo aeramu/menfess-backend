@@ -208,7 +208,7 @@ func (s *service) CreatePost(ctx context.Context, req api.CreatePostReq) (*api.C
 		RepliesCount: 0,
 		LikesCount:   0,
 		Parent:       &entity.Post{ID: req.ParentID},
-		Author:       &entity.User{ID: req.AuthorID},
+		Author:       entity.User{ID: req.AuthorID},
 		User:         entity.User{ID: req.UserID},
 	}); err != nil {
 		s.adapter.LogModule.Log(err, req, "[CreatePost] failed save post")

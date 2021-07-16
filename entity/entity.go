@@ -20,11 +20,11 @@ type Profile struct {
 type Post struct {
 	ID           string
 	Body         string
-	Timestamp    int
+	Timestamp    int64
 	RepliesCount int
 	LikesCount   int
 	IsLiked      bool
 	Parent       *Post
-	Author       *User
+	Author       User
 	User         User
 }
