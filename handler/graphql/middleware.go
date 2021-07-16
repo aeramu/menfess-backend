@@ -3,6 +3,7 @@ package graphql
 import (
 	"context"
 	"errors"
+	"github.com/aeramu/menfess-backend/constants"
 	"github.com/aeramu/menfess-backend/modules/auth"
 )
 
@@ -11,7 +12,7 @@ type Token struct {
 }
 
 func DecodeToken(ctx context.Context) (*Token, error) {
-	tokenString, ok := ctx.Value("token").(string)
+	tokenString, ok := ctx.Value(constants.AuthorizationKey).(string)
 	if !ok {
 		return nil, errors.New("token is required")
 	}

@@ -2,14 +2,9 @@ package graphql
 
 import (
 	"context"
-	"github.com/aeramu/menfess-backend/service"
 	"github.com/aeramu/menfess-backend/service/api"
 	"github.com/graph-gophers/graphql-go"
 )
-
-type Resolver struct {
-	svc service.Service
-}
 
 func (r *Resolver) Login(ctx context.Context, input struct{
 	Email string
