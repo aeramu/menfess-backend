@@ -73,8 +73,8 @@ func (u *userModule) SaveProfile(ctx context.Context, user entity.User) error {
 }
 
 func (u *userModule) FindMenfessList(ctx context.Context) ([]entity.User, error) {
-	model := Users{}
-	if err := u.user.Query().Equal("type", "menfess").Find(ctx).Consume(model); err != nil {
+	var model Users
+	if err := u.user.Query().Equal("type", "menfess").Find(ctx).Consume(&model); err != nil {
 		return nil, err
 	}
 	return model.Entity(), nil
