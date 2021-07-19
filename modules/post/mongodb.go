@@ -81,11 +81,39 @@ func (m *postModule) InsertPost(ctx context.Context, post entity.Post) (string, 
 }
 
 func (m *postModule) LikePost(ctx context.Context, postID string, userID string) error {
-	panic("implement me")
+	var model Post
+	if err := m.post.Query().
+		Equal("_id", mongolib.ObjectID(postID)).
+		FindOne(ctx).Consume(&model);
+	err != nil {
+		return err
+	}
+
+	model.Likes[userID] = true
+
+	if err := m.post.Save(ctx, mongolib.ObjectID(postID), model); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (m *postModule) UnlikePost(ctx context.Context, postID string, userID string) error {
-	panic("implement me")
+	var model Post
+	if err := m.post.Query().
+		Equal("_id", mongolib.ObjectID(postID)).
+		FindOne(ctx).Consume(&model);
+		err != nil {
+		return err
+	}
+
+	delete(model.Likes, userID)
+
+	if err := m.post.Save(ctx, mongolib.ObjectID(postID), model); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type Post struct {
