@@ -28,6 +28,20 @@ func (_m *NotificationModule) AddPushToken(ctx context.Context, userID string, p
 	return r0
 }
 
+// SendCommentNotification provides a mock function with given fields: ctx, user, post
+func (_m *NotificationModule) SendCommentNotification(ctx context.Context, user entity.User, post entity.Post) error {
+	ret := _m.Called(ctx, user, post)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, entity.User, entity.Post) error); ok {
+		r0 = rf(ctx, user, post)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // SendLikeNotification provides a mock function with given fields: ctx, user, post
 func (_m *NotificationModule) SendLikeNotification(ctx context.Context, user entity.User, post entity.Post) error {
 	ret := _m.Called(ctx, user, post)

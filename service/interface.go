@@ -36,7 +36,7 @@ type PostModule interface {
 		userID string,
 		pagination api.PaginationReq,
 	) ([]entity.Post, *api.PaginationRes, error)
-	SavePost(ctx context.Context, post entity.Post) error
+	InsertPost(ctx context.Context, post entity.Post) (string, error)
 	LikePost(ctx context.Context, postID string, userID string) error
 	UnlikePost(ctx context.Context, postID string, userID string) error
 }
@@ -44,6 +44,7 @@ type PostModule interface {
 type NotificationModule interface {
 	AddPushToken(ctx context.Context, userID string, pushToken string) error
 	SendLikeNotification(ctx context.Context, user entity.User, post entity.Post) error
+	SendCommentNotification(ctx context.Context, user entity.User, post entity.Post) error
 }
 
 type LogModule interface {

@@ -25,3 +25,9 @@ func (m *notificationModule) SendLikeNotification(ctx context.Context, user enti
 	return nil
 }
 
+func (m *notificationModule) SendCommentNotification(ctx context.Context, user entity.User, post entity.Post) error {
+	fmt.Printf("send notification [%s comment your post] to %s\n", user.Profile.Name, post.User.ID)
+	return nil
+}
+
+

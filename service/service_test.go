@@ -898,7 +898,45 @@ func Test_service_CreatePost(t *testing.T)  {
 			prepare: func() {
 				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
 					Return(&entity.User{}, nil)
-				mockPostModule.On("SavePost", mock.Anything, mock.Anything).
+				mockPostModule.On("InsertPost", mock.Anything, mock.Anything).
+					Return("", err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when get post",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(&entity.User{}, nil)
+				mockPostModule.On("InsertPost", mock.Anything, mock.Anything).
+					Return("post-id", nil)
+				mockPostModule.On("FindPostByID", mock.Anything, "post-id", "").
+					Return(nil, err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when send notification",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(&entity.User{}, nil)
+				mockPostModule.On("InsertPost", mock.Anything, mock.Anything).
+					Return("post-id", nil)
+				mockPostModule.On("FindPostByID", mock.Anything, "post-id", "").
+					Return(&entity.Post{}, nil)
+				mockNotificationModule.On("SendCommentNotification", mock.Anything, entity.User{}, entity.Post{}).
 					Return(err)
 				mockLogModule.On("Log", err, req, mock.Anything)
 			},
@@ -914,13 +952,17 @@ func Test_service_CreatePost(t *testing.T)  {
 			prepare: func() {
 				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
 					Return(&entity.User{}, nil)
-				mockPostModule.On("SavePost", mock.Anything, mock.MatchedBy(func(p entity.Post) bool {
+				mockPostModule.On("InsertPost", mock.Anything, mock.MatchedBy(func(p entity.Post) bool {
 					assert.Equal(t, req.Body, p.Body)
 					assert.Equal(t, req.AuthorID, p.Author.ID)
 					assert.Equal(t, req.ParentID, p.Parent.ID)
 					assert.Equal(t, req.UserID, p.User.ID)
 					return true
-				})).Return(nil)
+				})).Return("post-id", nil)
+				mockPostModule.On("FindPostByID", mock.Anything, "post-id", "").
+					Return(&entity.Post{}, nil)
+				mockNotificationModule.On("SendCommentNotification", mock.Anything, entity.User{}, entity.Post{}).
+					Return(nil)
 			},
 			args:    args{
 				ctx: ctx,

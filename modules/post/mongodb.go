@@ -63,7 +63,7 @@ func (m *postModule) FindPostListByParentIDAndAuthorIDs(ctx context.Context, par
 	}, nil
 }
 
-func (m *postModule) SavePost(ctx context.Context, post entity.Post) error {
+func (m *postModule) InsertPost(ctx context.Context, post entity.Post) (string, error) {
 	id := mongolib.NewObjectID()
 	if err := m.post.Save(ctx, id, Post{
 		ID:           id,
@@ -74,10 +74,10 @@ func (m *postModule) SavePost(ctx context.Context, post entity.Post) error {
 		AuthorID:     mongolib.ObjectID(post.Author.ID),
 		User:         mongolib.ObjectID(post.User.ID),
 	}); err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return id.Hex(), nil
 }
 
 func (m *postModule) LikePost(ctx context.Context, postID string, userID string) error {

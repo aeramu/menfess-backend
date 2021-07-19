@@ -72,6 +72,27 @@ func (_m *PostModule) FindPostListByParentIDAndAuthorIDs(ctx context.Context, pa
 	return r0, r1, r2
 }
 
+// InsertPost provides a mock function with given fields: ctx, post
+func (_m *PostModule) InsertPost(ctx context.Context, post entity.Post) (string, error) {
+	ret := _m.Called(ctx, post)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(context.Context, entity.Post) string); ok {
+		r0 = rf(ctx, post)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, entity.Post) error); ok {
+		r1 = rf(ctx, post)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // LikePost provides a mock function with given fields: ctx, postID, userID
 func (_m *PostModule) LikePost(ctx context.Context, postID string, userID string) error {
 	ret := _m.Called(ctx, postID, userID)
@@ -79,20 +100,6 @@ func (_m *PostModule) LikePost(ctx context.Context, postID string, userID string
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
 		r0 = rf(ctx, postID, userID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// SavePost provides a mock function with given fields: ctx, post
-func (_m *PostModule) SavePost(ctx context.Context, post entity.Post) error {
-	ret := _m.Called(ctx, post)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, entity.Post) error); ok {
-		r0 = rf(ctx, post)
 	} else {
 		r0 = ret.Error(0)
 	}

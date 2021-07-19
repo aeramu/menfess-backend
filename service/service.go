@@ -195,7 +195,8 @@ func (s *service) CreatePost(ctx context.Context, req api.CreatePostReq) (*api.C
 		return nil, err
 	}
 
-	if _, err := s.adapter.UserModule.FindUserByID(ctx, req.UserID); err != nil {
+	user, err := s.adapter.UserModule.FindUserByID(ctx, req.UserID);
+	if err != nil {
 		if err == constants.ErrUserNotFound {
 			return nil, constants.ErrUserNotFound
 		}
@@ -203,16 +204,29 @@ func (s *service) CreatePost(ctx context.Context, req api.CreatePostReq) (*api.C
 		return nil, constants.ErrInternalServerError
 	}
 
-	if err := s.adapter.PostModule.SavePost(ctx, entity.Post{
+	postID, err := s.adapter.PostModule.InsertPost(ctx, entity.Post{
 		Body:         req.Body,
 		RepliesCount: 0,
 		LikesCount:   0,
 		Parent:       &entity.Post{ID: req.ParentID},
 		Author:       entity.User{ID: req.AuthorID},
 		User:         entity.User{ID: req.UserID},
-	}); err != nil {
+	});
+	if err != nil {
 		s.adapter.LogModule.Log(err, req, "[CreatePost] failed save post")
 		return nil, constants.ErrInternalServerError
+	}
+
+	if req.AuthorID != "" {
+		post, err := s.adapter.PostModule.FindPostByID(ctx, postID, "")
+		if err != nil {
+			s.adapter.LogModule.Log(err, req, "[CreatePost] failed get post")
+			return nil, constants.ErrInternalServerError
+		}
+		if err := s.adapter.NotificationModule.SendCommentNotification(ctx, *user, *post); err != nil {
+			s.adapter.LogModule.Log(err, req, "[CreatePost] failed send notification")
+			return nil, constants.ErrInternalServerError
+		}
 	}
 
 	return &api.CreatePostRes{Message: "success"}, nil
