@@ -18,7 +18,7 @@ type Mutation {
 
 type Query {
     """ Post """
-    posts(first: Int!, after: ID, filter:[ID!]): PostsResponse!
+    feed(first: Int!, after: ID, filter:[ID!]): FeedResponse!
     post(id: ID!): PostResponse!
     menfess: MenfessResponse!
 
@@ -39,7 +39,7 @@ type BasicMutationResponse {
     error: Error!
 }
 
-type PostsResponse {
+type FeedResponse {
     payload: PostConnection!
     error: Error!
 }

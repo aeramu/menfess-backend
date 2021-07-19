@@ -79,7 +79,7 @@ func (p Post) Replies(ctx context.Context, input struct{
 	}
 
 	return PostConnection{
-		Edges:    ResolvePostEdges(res.PostList),
+		Edges:    ResolvePostEdges(p.Resolver, res.PostList),
 		PageInfo: PageInfo{
 			EndCursor:   graphql.ID(res.Pagination.EndCursor),
 			HasNextPage: res.Pagination.HasNextPage,
@@ -97,8 +97,9 @@ type PostConnection struct {
 	PageInfo PageInfo
 }
 
-func ResolvePost(post entity.Post) Post {
+func ResolvePost(r *Resolver, post entity.Post) Post {
 	return Post{
+		Resolver:     r,
 		ID:           graphql.ID(post.ID),
 		Body:         post.Body,
 		Timestamp:    int32(post.Timestamp),
@@ -109,11 +110,11 @@ func ResolvePost(post entity.Post) Post {
 	}
 }
 
-func ResolvePostEdges(posts []entity.Post) []PostEdge {
+func ResolvePostEdges(r *Resolver, posts []entity.Post) []PostEdge {
 	var edges []PostEdge
 	for _, v := range posts {
 		edges = append(edges, PostEdge{
-			Node:   ResolvePost(v),
+			Node:   ResolvePost(r, v),
 			Cursor: graphql.ID(v.ID),
 		})
 	}

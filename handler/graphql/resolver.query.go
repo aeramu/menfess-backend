@@ -23,19 +23,19 @@ func (r *Resolver) Post(ctx context.Context, input struct{
 		return PostResponse{Error: Error(err)}
 	}
 	return PostResponse{
-		Payload: ResolvePost(res.Post),
+		Payload: ResolvePost(r, res.Post),
 		Error:   NoError,
 	}
 }
 
-func (r *Resolver) Posts(ctx context.Context, input struct{
+func (r *Resolver) Feed(ctx context.Context, input struct{
 	First int32
 	After *graphql.ID
 	Filter *[]graphql.ID
-}) PostsResponse {
+}) FeedResponse {
 	token, err := DecodeToken(ctx)
 	if err != nil {
-		return PostsResponse{
+		return FeedResponse{
 			Error:   Error(err),
 		}
 	}
@@ -50,11 +50,11 @@ func (r *Resolver) Posts(ctx context.Context, input struct{
 	}
 	res, err := r.svc.GetPostList(ctx, req)
 	if err != nil {
-		return PostsResponse{Error: Error(err)}
+		return FeedResponse{Error: Error(err)}
 	}
-	return PostsResponse{
+	return FeedResponse{
 		Payload: PostConnection{
-			Edges:    ResolvePostEdges(res.PostList),
+			Edges:    ResolvePostEdges(r, res.PostList),
 			PageInfo: PageInfo{
 				EndCursor:   graphql.ID(res.Pagination.EndCursor),
 				HasNextPage: res.Pagination.HasNextPage,

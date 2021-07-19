@@ -32,7 +32,7 @@ type PostResponse struct {
 	Error Err
 }
 
-type PostsResponse struct {
+type FeedResponse struct {
 	Payload PostConnection
 	Error Err
 }
