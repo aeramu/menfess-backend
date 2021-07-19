@@ -916,7 +916,7 @@ func Test_service_CreatePost(t *testing.T)  {
 					Return(&entity.User{}, nil)
 				mockPostModule.On("InsertPost", mock.Anything, mock.Anything).
 					Return("post-id", nil)
-				mockPostModule.On("FindPostByID", mock.Anything, "post-id", "").
+				mockPostModule.On("FindPostByID", mock.Anything, req.ParentID, "").
 					Return(nil, err)
 				mockLogModule.On("Log", err, req, mock.Anything)
 			},
@@ -934,7 +934,7 @@ func Test_service_CreatePost(t *testing.T)  {
 					Return(&entity.User{}, nil)
 				mockPostModule.On("InsertPost", mock.Anything, mock.Anything).
 					Return("post-id", nil)
-				mockPostModule.On("FindPostByID", mock.Anything, "post-id", "").
+				mockPostModule.On("FindPostByID", mock.Anything, req.ParentID, "").
 					Return(&entity.Post{}, nil)
 				mockNotificationModule.On("SendCommentNotification", mock.Anything, entity.User{}, entity.Post{}).
 					Return(err)
@@ -959,7 +959,7 @@ func Test_service_CreatePost(t *testing.T)  {
 					assert.Equal(t, req.UserID, p.User.ID)
 					return true
 				})).Return("post-id", nil)
-				mockPostModule.On("FindPostByID", mock.Anything, "post-id", "").
+				mockPostModule.On("FindPostByID", mock.Anything, req.ParentID, "").
 					Return(&entity.Post{}, nil)
 				mockNotificationModule.On("SendCommentNotification", mock.Anything, entity.User{}, entity.Post{}).
 					Return(nil)

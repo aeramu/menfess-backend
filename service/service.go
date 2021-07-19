@@ -204,21 +204,20 @@ func (s *service) CreatePost(ctx context.Context, req api.CreatePostReq) (*api.C
 		return nil, constants.ErrInternalServerError
 	}
 
-	postID, err := s.adapter.PostModule.InsertPost(ctx, entity.Post{
+	if _, err := s.adapter.PostModule.InsertPost(ctx, entity.Post{
 		Body:         req.Body,
 		RepliesCount: 0,
 		LikesCount:   0,
 		Parent:       &entity.Post{ID: req.ParentID},
 		Author:       entity.User{ID: req.AuthorID},
 		User:         entity.User{ID: req.UserID},
-	});
-	if err != nil {
+	}); err != nil {
 		s.adapter.LogModule.Log(err, req, "[CreatePost] failed save post")
 		return nil, constants.ErrInternalServerError
 	}
 
 	if req.AuthorID != "" {
-		post, err := s.adapter.PostModule.FindPostByID(ctx, postID, "")
+		post, err := s.adapter.PostModule.FindPostByID(ctx, req.ParentID, "")
 		if err != nil {
 			s.adapter.LogModule.Log(err, req, "[CreatePost] failed get post")
 			return nil, constants.ErrInternalServerError
