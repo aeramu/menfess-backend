@@ -3,6 +3,7 @@ package graphql
 import (
 	"context"
 	"github.com/aeramu/menfess-backend/entity"
+	"github.com/aeramu/menfess-backend/service/api"
 	"github.com/graph-gophers/graphql-go"
 )
 
@@ -44,6 +45,7 @@ func ResolveUserEdges(posts []entity.User) []UserEdge {
 }
 
 type Post struct {
+	*Resolver
 	ID           graphql.ID
 	Body         string
 	Timestamp    int32
@@ -54,10 +56,35 @@ type Post struct {
 }
 
 func (p Post) Replies(ctx context.Context, input struct{
-	First int
+	First int32
 	After *graphql.ID
 }) PostConnection {
-	return PostConnection{}
+	token, err := DecodeToken(ctx)
+	if err != nil {
+		return PostConnection{}
+	}
+	req := api.GetPostListReq{
+		UserID:     token.UserID,
+		ParentID:   string(p.ID),
+		Pagination: api.PaginationReq{
+			First: int(input.First),
+		},
+	}
+	if input.After != nil {
+		req.Pagination.After = string(*input.After)
+	}
+	res, err := p.svc.GetPostList(ctx, req)
+	if err != nil {
+		return PostConnection{}
+	}
+
+	return PostConnection{
+		Edges:    ResolvePostEdges(res.PostList),
+		PageInfo: PageInfo{
+			EndCursor:   graphql.ID(res.Pagination.EndCursor),
+			HasNextPage: res.Pagination.HasNextPage,
+		},
+	}
 }
 
 type PostEdge struct {
