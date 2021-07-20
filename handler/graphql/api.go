@@ -46,3 +46,8 @@ type MenfessResponse struct {
 	Payload UserConnection
 	Error Err
 }
+
+type AvatarsResponse struct {
+	Payload []string
+	Error Err
+}

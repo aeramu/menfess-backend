@@ -21,6 +21,7 @@ type Query {
     feed(first: Int!, after: ID, filter:[ID!]): FeedResponse!
     post(id: ID!): PostResponse!
     menfess: MenfessResponse!
+    avatars: AvatarResponse!
 
     me: MeResponse!
 }
@@ -56,6 +57,11 @@ type MeResponse {
 
 type MenfessResponse {
     payload: UserConnection!
+    error: Error!
+}
+
+type AvatarResponse {
+    payload: [String!]!
     error: Error!
 }
 

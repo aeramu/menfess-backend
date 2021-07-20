@@ -100,3 +100,10 @@ func (r *Resolver) Menfess(ctx context.Context) MenfessResponse {
 		Error:   NoError,
 	}
 }
+
+func (r *Resolver) Avatars(ctx context.Context) AvatarsResponse {
+	return AvatarsResponse{
+		Payload: []string{},
+		Error:   NoError,
+	}
+}
