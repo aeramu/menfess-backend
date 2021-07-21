@@ -2,21 +2,22 @@ package graphql
 
 import (
 	"context"
+
 	"github.com/aeramu/menfess-backend/service/api"
 	"github.com/graph-gophers/graphql-go"
 )
 
-func (r *Resolver) Post(ctx context.Context, input struct{
+func (r *Resolver) Post(ctx context.Context, input struct {
 	ID graphql.ID
 }) PostResponse {
 	token, err := DecodeToken(ctx)
 	if err != nil {
 		return PostResponse{
-			Error:   Error(err),
+			Error: Error(err),
 		}
 	}
 	res, err := r.svc.GetPost(ctx, api.GetPostReq{
-		ID: string(input.ID),
+		ID:     string(input.ID),
 		UserID: token.UserID,
 	})
 	if err != nil {
@@ -28,19 +29,19 @@ func (r *Resolver) Post(ctx context.Context, input struct{
 	}
 }
 
-func (r *Resolver) Feed(ctx context.Context, input struct{
-	First int32
-	After *graphql.ID
+func (r *Resolver) Feed(ctx context.Context, input struct {
+	First  int32
+	After  *graphql.ID
 	Filter *[]graphql.ID
 }) FeedResponse {
 	token, err := DecodeToken(ctx)
 	if err != nil {
 		return FeedResponse{
-			Error:   Error(err),
+			Error: Error(err),
 		}
 	}
 	req := api.GetPostListReq{
-		UserID:     token.UserID,
+		UserID: token.UserID,
 		Pagination: api.PaginationReq{
 			First: int(input.First),
 		},
@@ -54,13 +55,13 @@ func (r *Resolver) Feed(ctx context.Context, input struct{
 	}
 	return FeedResponse{
 		Payload: PostConnection{
-			Edges:    ResolvePostEdges(r, res.PostList),
+			Edges: ResolvePostEdges(r, res.PostList),
 			PageInfo: PageInfo{
 				EndCursor:   graphql.ID(res.Pagination.EndCursor),
 				HasNextPage: res.Pagination.HasNextPage,
 			},
 		},
-		Error:   NoError,
+		Error: NoError,
 	}
 }
 
@@ -68,7 +69,7 @@ func (r *Resolver) Me(ctx context.Context) MeResponse {
 	token, err := DecodeToken(ctx)
 	if err != nil {
 		return MeResponse{
-			Error:   Error(err),
+			Error: Error(err),
 		}
 	}
 	res, err := r.svc.GetUser(ctx, api.GetUserReq{
@@ -84,7 +85,7 @@ func (r *Resolver) Me(ctx context.Context) MeResponse {
 			Avatar: res.User.Profile.Avatar,
 			Bio:    res.User.Profile.Bio,
 		},
-		Error:   NoError,
+		Error: NoError,
 	}
 }
 
@@ -97,13 +98,25 @@ func (r *Resolver) Menfess(ctx context.Context) MenfessResponse {
 		Payload: UserConnection{
 			Edges: ResolveUserEdges(res.MenfessList),
 		},
-		Error:   NoError,
+		Error: NoError,
 	}
 }
 
 func (r *Resolver) Avatars(ctx context.Context) AvatarsResponse {
 	return AvatarsResponse{
-		Payload: []string{},
-		Error:   NoError,
+		Payload: []string{
+			"https://qiup-image.s3.amazonaws.com/avatar/avatar.jpg",
+			"https://qiup-image.s3.amazonaws.com/avatar/batman.jpg",
+			"https://qiup-image.s3.amazonaws.com/avatar/spiderman.jpg",
+			"https://qiup-image.s3.amazonaws.com/avatar/saitama.jpg",
+			"https://qiup-image.s3.amazonaws.com/avatar/kaonashi.jpg",
+			"https://qiup-image.s3.amazonaws.com/avatar/mrbean.jpg",
+			"https://qiup-image.s3.amazonaws.com/avatar/upin.jpg",
+			"https://qiup-image.s3.amazonaws.com/avatar/ipin.jpg",
+			"https://qiup-image.s3.amazonaws.com/avatar/einstein.jpg",
+			"https://qiup-image.s3.amazonaws.com/avatar/monalisa.jpg",
+			"https://qiup-image.s3.amazonaws.com/avatar/ronald.jpg",
+		},
+		Error: NoError,
 	}
 }
