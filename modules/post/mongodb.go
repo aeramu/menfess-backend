@@ -7,6 +7,7 @@ import (
 	"github.com/aeramu/menfess-backend/service"
 	"github.com/aeramu/menfess-backend/service/api"
 	"github.com/aeramu/mongolib"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -26,6 +27,8 @@ func (m *postModule) FindPostByID(ctx context.Context, id string, userID string)
 		Unwind("$author").
 		Lookup("user", "user_id", "_id", "user").
 		Unwind("$user").
+		Lookup("post", "_id", "parent_id", "replies").
+		AddField("replies_count", bson.D{{"$size", "$replies"}}).
 		Exec(ctx).Consume(&model);
 	err != nil {
 		return nil, err
@@ -53,6 +56,8 @@ func (m *postModule) FindPostListByParentIDAndAuthorIDs(ctx context.Context, par
 		Unwind("$author").
 		Lookup("user", "user_id", "_id", "user").
 		Unwind("$user").
+		Lookup("post", "_id", "parent_id", "replies").
+		AddField("replies_count", bson.D{{"$size", "$replies"}}).
 		Exec(ctx).Consume(&model);
 		err != nil {
 		return nil, nil, err
@@ -68,7 +73,6 @@ func (m *postModule) InsertPost(ctx context.Context, post entity.Post) (string, 
 	if err := m.post.Save(ctx, id, Post{
 		ID:           id,
 		Body:         post.Body,
-		RepliesCount: post.RepliesCount,
 		Likes:        map[string]bool{},
 		ParentID:     mongolib.ObjectID(post.Parent.ID),
 		AuthorID:     mongolib.ObjectID(post.Author.ID),
@@ -119,7 +123,6 @@ func (m *postModule) UnlikePost(ctx context.Context, postID string, userID strin
 type Post struct {
 	ID           primitive.ObjectID `bson:"_id"`
 	Body         string             `bson:"body"`
-	RepliesCount int                `bson:"replies_count"`
 	Likes        map[string]bool    `bson:"likes"`
 	ParentID     primitive.ObjectID `bson:"parent_id"`
 	AuthorID     primitive.ObjectID `bson:"author_id"`

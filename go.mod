@@ -3,7 +3,7 @@ module github.com/aeramu/menfess-backend
 go 1.16
 
 require (
-	github.com/aeramu/mongolib v1.1.3
+	github.com/aeramu/mongolib v1.1.4
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/graph-gophers/graphql-go v1.1.0
 	github.com/sirupsen/logrus v1.4.2

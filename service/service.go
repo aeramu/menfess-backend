@@ -206,8 +206,6 @@ func (s *service) CreatePost(ctx context.Context, req api.CreatePostReq) (*api.C
 
 	if _, err := s.adapter.PostModule.InsertPost(ctx, entity.Post{
 		Body:         req.Body,
-		RepliesCount: 0,
-		LikesCount:   0,
 		Parent:       &entity.Post{ID: req.ParentID},
 		Author:       entity.User{ID: req.AuthorID},
 		User:         entity.User{ID: req.UserID},
