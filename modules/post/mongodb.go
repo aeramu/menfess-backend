@@ -63,7 +63,12 @@ func (m *postModule) FindPostListByParentIDAndAuthorIDs(ctx context.Context, par
 		return nil, nil, err
 	}
 
+	endCursor := ""
+	if len(model) > 0 {
+		endCursor = model[len(model)-1].ID.Hex()
+	}
 	return model.Entity(userID), &api.PaginationRes{
+		EndCursor: endCursor,
 		HasNextPage: len(model) >= pagination.First,
 	}, nil
 }

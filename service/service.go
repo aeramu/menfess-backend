@@ -214,7 +214,7 @@ func (s *service) CreatePost(ctx context.Context, req api.CreatePostReq) (*api.C
 		return nil, constants.ErrInternalServerError
 	}
 
-	if req.AuthorID != "" {
+	if req.ParentID != "" {
 		post, err := s.adapter.PostModule.FindPostByID(ctx, req.ParentID, "")
 		if err != nil {
 			s.adapter.LogModule.Log(err, req, "[CreatePost] failed get post")
