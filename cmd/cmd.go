@@ -25,7 +25,7 @@ func Run() {
 		UserModule:         user.NewUserModule(db),
 		PostModule:         post.NewPostModule(db),
 		AuthModule:         auth.NewAuthModule(),
-		NotificationModule: notification.NewNotificationModule(),
+		NotificationModule: notification.NewNotificationModule(db),
 		LogModule:          logModule.NewLogModule(),
 	}
 	svc := service.NewService(adapter)
