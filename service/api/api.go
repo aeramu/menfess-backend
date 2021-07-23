@@ -7,93 +7,6 @@ import (
 	"strings"
 )
 
-type LoginReq struct {
-	Email     string
-	Password  string
-	PushToken string
-}
-
-type LoginRes struct {
-	Token string
-}
-
-type RegisterReq struct {
-	Email     string
-	Password  string
-	PushToken string
-}
-
-type RegisterRes struct {
-	Token string
-}
-
-type UpdateProfileReq struct {
-	ID     string
-	Name   string
-	Avatar string
-	Bio    string
-}
-
-type UpdateProfileRes struct {
-	Message string
-}
-
-type GetUserReq struct {
-	ID string
-}
-
-type GetUserRes struct {
-	User entity.User
-}
-
-type GetMenfessListReq struct {
-}
-
-type GetMenfessListRes struct {
-	MenfessList []entity.User
-}
-
-type GetPostReq struct {
-	ID     string
-	UserID string
-}
-
-type GetPostRes struct {
-	Post entity.Post
-}
-
-type GetPostListReq struct {
-	ParentID   string
-	AuthorIDs  []string
-	UserID     string
-	Pagination PaginationReq
-}
-
-type GetPostListRes struct {
-	PostList   []entity.Post
-	Pagination PaginationRes
-}
-
-type CreatePostReq struct {
-	Body     string
-	UserID   string
-	AuthorID string
-	ParentID string
-}
-
-type CreatePostRes struct {
-	Message string
-}
-
-type LikePostReq struct {
-	PostID string
-	UserID string
-}
-
-type LikePostRes struct {
-	Message string
-}
-
 type PaginationReq struct {
 	First int
 	After string
@@ -102,6 +15,16 @@ type PaginationReq struct {
 type PaginationRes struct {
 	EndCursor   string
 	HasNextPage bool
+}
+
+type LoginReq struct {
+	Email     string
+	Password  string
+	PushToken string
+}
+
+type LoginRes struct {
+	Token string
 }
 
 func (req LoginReq) Validate() error {
@@ -117,6 +40,16 @@ func (req LoginReq) Validate() error {
 	return nil
 }
 
+type RegisterReq struct {
+	Email     string
+	Password  string
+	PushToken string
+}
+
+type RegisterRes struct {
+	Token string
+}
+
 func (req RegisterReq) Validate() error {
 	if err := utils.ValidateEmail(req.Email); err != nil {
 		return constants.ErrInvalidEmail
@@ -128,6 +61,17 @@ func (req RegisterReq) Validate() error {
 		return constants.ErrInvalidPushToken
 	}
 	return nil
+}
+
+type UpdateProfileReq struct {
+	ID     string
+	Name   string
+	Avatar string
+	Bio    string
+}
+
+type UpdateProfileRes struct {
+	Message string
 }
 
 func (req *UpdateProfileReq) Validate() error {
@@ -145,6 +89,14 @@ func (req *UpdateProfileReq) Validate() error {
 	return nil
 }
 
+type GetUserReq struct {
+	ID string
+}
+
+type GetUserRes struct {
+	User entity.User
+}
+
 func (req GetUserReq) Validate() error {
 	if req.ID == "" {
 		return constants.ErrInvalidID
@@ -152,8 +104,24 @@ func (req GetUserReq) Validate() error {
 	return nil
 }
 
+type GetMenfessListReq struct {
+}
+
+type GetMenfessListRes struct {
+	MenfessList []entity.User
+}
+
 func (req GetMenfessListReq) Validate() error {
 	return nil
+}
+
+type GetPostReq struct {
+	ID     string
+	UserID string
+}
+
+type GetPostRes struct {
+	Post entity.Post
 }
 
 func (req GetPostReq) Validate() error {
@@ -166,6 +134,18 @@ func (req GetPostReq) Validate() error {
 	return nil
 }
 
+type GetPostListReq struct {
+	ParentID   string
+	AuthorIDs  []string
+	UserID     string
+	Pagination PaginationReq
+}
+
+type GetPostListRes struct {
+	PostList   []entity.Post
+	Pagination PaginationRes
+}
+
 func (req *GetPostListReq) Validate() error {
 	if req.UserID == "" {
 		return constants.ErrInvalidUserID
@@ -176,6 +156,17 @@ func (req *GetPostListReq) Validate() error {
 	return nil
 }
 
+type CreatePostReq struct {
+	Body     string
+	UserID   string
+	AuthorID string
+	ParentID string
+}
+
+type CreatePostRes struct {
+	Message string
+}
+
 func (req CreatePostReq) Validate() error {
 	if req.Body == "" {
 		return constants.ErrInvalidBody
@@ -184,6 +175,15 @@ func (req CreatePostReq) Validate() error {
 		return constants.ErrInvalidUserID
 	}
 	return nil
+}
+
+type LikePostReq struct {
+	PostID string
+	UserID string
+}
+
+type LikePostRes struct {
+	Message string
 }
 
 func (req LikePostReq) Validate() error {
