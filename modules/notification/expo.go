@@ -27,7 +27,7 @@ func (m *notificationModule) sendNotification(tokens []string, title, body strin
 	go func() {
 		_, err := http.Post(expoURL, contentType, bytes.NewReader(b))
 		if err != nil {
-			logrus.Errorln("[SendNotification] Failed send http request")
+			logrus.Errorln("[SendNotification] Failed send http request:", err)
 		}
 	}()
 
