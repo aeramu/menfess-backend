@@ -7,6 +7,7 @@ type Mutation {
     """ Auth """
     login(email: String!, password: String!, pushToken: String!): AuthResponse!
     register(email: String!, password: String!, pushToken: String!): AuthResponse!
+    logout(pushToken: String!): BasicMutationResponse!
 
     """ Profile """
     updateProfile(name: String!, avatar: String!, bio: String!): BasicMutationResponse!

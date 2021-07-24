@@ -25,6 +25,27 @@ func (r *Resolver) Login(ctx context.Context, input struct{
 	}
 }
 
+func (r *Resolver) Logout(ctx context.Context, input struct{
+	PushToken string
+}) BasicMutationResponse {
+	token, err := DecodeToken(ctx)
+	if err != nil {
+		return BasicMutationResponse{
+			Error:   Error(err),
+		}
+	}
+	_, err = r.svc.Logout(ctx, api.LogoutReq{
+		UserID:    token.UserID,
+		PushToken: input.PushToken,
+	})
+	if err != nil {
+		return BasicMutationResponse{Error: Error(err)}
+	}
+	return BasicMutationResponse{
+		Error: NoError,
+	}
+}
+
 func (r *Resolver) Register(ctx context.Context, input struct{
 	Email string
 	Password string

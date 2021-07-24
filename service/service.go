@@ -10,6 +10,7 @@ import (
 type Service interface {
 	Login(ctx context.Context, req api.LoginReq) (*api.LoginRes, error)
 	Register(ctx context.Context, req api.RegisterReq) (*api.RegisterRes, error)
+	Logout(ctx context.Context, req api.LogoutReq) (*api.LogoutRes, error)
 	UpdateProfile(ctx context.Context, req api.UpdateProfileReq) (*api.UpdateProfileRes, error)
 	GetUser(ctx context.Context, req api.GetUserReq) (*api.GetUserRes, error)
 	GetMenfessList(ctx context.Context, req api.GetMenfessListReq) (*api.GetMenfessListRes, error)
