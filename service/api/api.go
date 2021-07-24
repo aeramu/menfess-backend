@@ -195,3 +195,22 @@ func (req LikePostReq) Validate() error {
 	}
 	return nil
 }
+
+type LogoutReq struct {
+	UserID    string
+	PushToken string
+}
+
+type LogoutRes struct {
+	Message string
+}
+
+func (req LogoutReq) Validate() error {
+	if req.UserID == "" {
+		return constants.ErrInvalidUserID
+	}
+	if req.PushToken == "" {
+		return constants.ErrInvalidPushToken
+	}
+	return nil
+}

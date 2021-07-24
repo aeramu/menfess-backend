@@ -104,6 +104,19 @@ func (s *service) Register(ctx context.Context, req api.RegisterReq) (*api.Regis
 	return &api.RegisterRes{Token: token}, nil
 }
 
+func (s *service) Logout(ctx context.Context, req api.LogoutReq) (*api.LogoutRes, error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	if err := s.adapter.NotificationModule.RemovePushToken(ctx, req.UserID, req.PushToken); err != nil {
+		s.adapter.LogModule.Log(err, req, "[Logout] Failed remove push token")
+		return nil, constants.ErrInternalServerError
+	}
+
+	return &api.LogoutRes{Message: "Success"}, nil
+}
+
 // TODO: Refactor case when user not found, expected to insert new profile
 func (s *service) UpdateProfile(ctx context.Context, req api.UpdateProfileReq) (*api.UpdateProfileRes, error) {
 	if err := req.Validate(); err != nil {
@@ -195,7 +208,7 @@ func (s *service) CreatePost(ctx context.Context, req api.CreatePostReq) (*api.C
 		return nil, err
 	}
 
-	user, err := s.adapter.UserModule.FindUserByID(ctx, req.UserID);
+	user, err := s.adapter.UserModule.FindUserByID(ctx, req.UserID)
 	if err != nil {
 		if err == constants.ErrUserNotFound {
 			return nil, constants.ErrUserNotFound
@@ -234,7 +247,7 @@ func (s *service) LikePost(ctx context.Context, req api.LikePostReq) (*api.LikeP
 		return nil, err
 	}
 
-	user, err := s.adapter.UserModule.FindUserByID(ctx, req.UserID);
+	user, err := s.adapter.UserModule.FindUserByID(ctx, req.UserID)
 	if err != nil {
 		if err == constants.ErrUserNotFound {
 			return nil, constants.ErrUserNotFound

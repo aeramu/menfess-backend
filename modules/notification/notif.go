@@ -3,6 +3,7 @@ package notification
 import (
 	"context"
 	"fmt"
+	"github.com/aeramu/menfess-backend/constants"
 	"github.com/aeramu/menfess-backend/entity"
 	"github.com/aeramu/menfess-backend/service"
 	"github.com/aeramu/mongolib"
@@ -25,6 +26,16 @@ const(
 
 func (m *notificationModule) AddPushToken(ctx context.Context, userID string, pushToken string) error {
 	if err := m.insertPushToken(ctx, userID, pushToken); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *notificationModule) RemovePushToken(ctx context.Context, userID string, pushToken string) error {
+	if err := m.removePushToken(ctx, userID, pushToken); err != nil {
+		if err == mongolib.ErrNotFound {
+			return constants.ErrUserNotFound
+		}
 		return err
 	}
 	return nil

@@ -487,3 +487,51 @@ func TestLikePostReq_Validate(t *testing.T) {
 		})
 	}
 }
+
+func TestLogoutReq_Validate(t *testing.T) {
+	type fields struct {
+		UserID    string
+		PushToken string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		{
+			name:    "empty user id",
+			fields:  fields{
+				UserID:    "",
+				PushToken: "token",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "empty token",
+			fields:  fields{
+				UserID:    "user-id",
+				PushToken: "",
+			},
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			fields:  fields{
+				UserID:    "user-id",
+				PushToken: "token",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := LogoutReq{
+				UserID:    tt.fields.UserID,
+				PushToken: tt.fields.PushToken,
+			}
+			if err := req.Validate(); (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

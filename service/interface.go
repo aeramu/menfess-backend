@@ -43,6 +43,7 @@ type PostModule interface {
 
 type NotificationModule interface {
 	AddPushToken(ctx context.Context, userID string, pushToken string) error
+	RemovePushToken(ctx context.Context, userID string, pushToken string) error
 	SendLikeNotification(ctx context.Context, user entity.User, post entity.Post) error
 	SendCommentNotification(ctx context.Context, user entity.User, post entity.Post) error
 }

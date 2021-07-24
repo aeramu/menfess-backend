@@ -1192,3 +1192,82 @@ func Test_service_LikePost(t *testing.T)  {
 		})
 	}
 }
+
+func Test_service_Logout(t *testing.T)  {
+	var (
+		ctx = context.Background()
+		err = errors.New("some error")
+		req = api.LogoutReq{
+			UserID:    "user-id",
+			PushToken: "token",
+		}
+	)
+	type args struct {
+		ctx context.Context
+		req api.LogoutReq
+	}
+	tests := []struct {
+		name    string
+		prepare func()
+		args    args
+		want    *api.LogoutRes
+		wantErr bool
+	}{
+		{
+			name:    "invalid argument",
+			prepare: nil,
+			args:    args{
+				ctx: ctx,
+				req : api.LogoutReq{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error when remove push token",
+			prepare: func() {
+				mockNotificationModule.On("RemovePushToken", mock.Anything, req.UserID, req.PushToken).
+					Return(err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			prepare: func() {
+				mockNotificationModule.On("RemovePushToken", mock.Anything, req.UserID, req.PushToken).
+					Return(nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    &api.LogoutRes{Message: "Success"},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			initTest()
+			if tt.prepare != nil {
+				tt.prepare()
+			}
+			s := &service{
+				adapter: adapter,
+			}
+			got, err := s.Logout(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, got)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.want, got)
+			}
+		})
+	}
+}

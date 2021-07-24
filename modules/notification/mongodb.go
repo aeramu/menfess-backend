@@ -42,6 +42,24 @@ func (m *notificationModule) insertPushToken(ctx context.Context, userID string,
 	return nil
 }
 
+func (m *notificationModule) removePushToken(ctx context.Context, userID string, token string) error {
+	var model PushToken
+	err := m.pushToken.Query().Equal("_id", mongolib.ObjectID(userID)).FindOne(ctx).Consume(&model)
+	if err != nil {
+		return err
+	}
+
+	_, ok := model.Token[token]
+	if ok {
+		delete(model.Token, token)
+		if err := m.pushToken.Save(ctx, model.ID, model); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 type PushToken struct {
 	ID    primitive.ObjectID `bson:"_id"`
 	Token map[string]bool    `bson:"token"`
