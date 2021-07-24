@@ -28,6 +28,7 @@ type LoginRes struct {
 }
 
 func (req LoginReq) Validate() error {
+	req.Email = strings.ToLower(req.Email)
 	if err := utils.ValidateEmail(req.Email); err != nil {
 		return constants.ErrInvalidEmail
 	}
@@ -51,6 +52,7 @@ type RegisterRes struct {
 }
 
 func (req RegisterReq) Validate() error {
+	req.Email = strings.ToLower(req.Email)
 	if err := utils.ValidateEmail(req.Email); err != nil {
 		return constants.ErrInvalidEmail
 	}
