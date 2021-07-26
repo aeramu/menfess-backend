@@ -35,9 +35,9 @@ func (req LoginReq) Validate() error {
 	if req.Password == "" {
 		return constants.ErrInvalidPassword
 	}
-	if req.PushToken == "" {
-		return constants.ErrInvalidPushToken
-	}
+	//if req.PushToken == "" {
+	//	return constants.ErrInvalidPushToken
+	//}
 	return nil
 }
 
@@ -59,9 +59,9 @@ func (req RegisterReq) Validate() error {
 	if req.Password == "" {
 		return constants.ErrInvalidPassword
 	}
-	if req.PushToken == "" {
-		return constants.ErrInvalidPushToken
-	}
+	//if req.PushToken == "" {
+	//	return constants.ErrInvalidPushToken
+	//}
 	return nil
 }
 
