@@ -30,11 +30,10 @@ func (m *notificationModule) sendNotification(tokens []string, title, body strin
 		if err != nil {
 			logrus.Errorln("[SendNotification] Failed send http request:", err)
 		}
-		b, err := ioutil.ReadAll(resp.Body)
+		_, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
 			logrus.Errorln("[SendNotification] Failed read http response:", err)
 		}
-		logrus.Infoln("[SendNotification]", string(b))
 	}()
 
 	return nil

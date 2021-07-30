@@ -6,8 +6,8 @@ import (
 	"github.com/aeramu/menfess-backend/constants"
 	"github.com/aeramu/menfess-backend/entity"
 	"github.com/aeramu/menfess-backend/service"
+	"github.com/aeramu/menfess-backend/utils"
 	"github.com/aeramu/mongolib"
-	"github.com/sirupsen/logrus"
 )
 
 func NewNotificationModule(db *mongolib.Database) service.NotificationModule {
@@ -23,7 +23,7 @@ type notificationModule struct {
 const(
 	likeNotificationTitle = "%s like your post"
 	commentNotificationTitle = "%s comment on your post"
-	newPostNotificationTitle = "%s post a menfess"
+	newPostNotificationTitle = "Someone post a menfess just now"
 )
 
 func (m *notificationModule) AddPushToken(ctx context.Context, userID string, pushToken string) error {
@@ -85,15 +85,13 @@ func (m *notificationModule) BroadcastNewPostNotification(ctx context.Context, p
 		return err
 	}
 
-	logrus.Infoln("[BroadcastNotification] token:", tokens)
-
-	//if utils.RandomChance(50, 100) {
-	//	return nil
-	//}
+	if utils.RandomChance(50, 100) {
+		return nil
+	}
 
 	if err := m.sendNotification(
 		tokens,
-		fmt.Sprintf(newPostNotificationTitle, post.User.Profile.Name),
+		fmt.Sprintf(newPostNotificationTitle),
 		post.Body,
 		Data{PostID: post.ID},
 	); err != nil {
