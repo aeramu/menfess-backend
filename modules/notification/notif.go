@@ -7,6 +7,7 @@ import (
 	"github.com/aeramu/menfess-backend/entity"
 	"github.com/aeramu/menfess-backend/service"
 	"github.com/aeramu/mongolib"
+	"github.com/sirupsen/logrus"
 )
 
 func NewNotificationModule(db *mongolib.Database) service.NotificationModule {
@@ -83,6 +84,8 @@ func (m *notificationModule) BroadcastNewPostNotification(ctx context.Context, p
 	if err != nil {
 		return err
 	}
+
+	logrus.Infoln("[BroadcastNotification] token:", tokens)
 
 	//if utils.RandomChance(50, 100) {
 	//	return nil
