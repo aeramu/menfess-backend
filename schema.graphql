@@ -6,7 +6,7 @@ schema {
 type Mutation {
     """ Auth """
     login(email: String!, password: String!, pushToken: String!): AuthResponse!
-    register(email: String!, password: String!, pushToken: String!): AuthResponse!
+    register(pushToken: String!): AuthResponse!
     logout(pushToken: String!): BasicMutationResponse!
 
     """ Profile """

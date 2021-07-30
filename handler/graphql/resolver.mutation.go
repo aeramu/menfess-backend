@@ -47,13 +47,9 @@ func (r *Resolver) Logout(ctx context.Context, input struct{
 }
 
 func (r *Resolver) Register(ctx context.Context, input struct{
-	Email string
-	Password string
 	PushToken string
 }) AuthResponse {
 	res, err := r.svc.Register(ctx, api.RegisterReq{
-		Email:     input.Email,
-		Password:  input.Password,
 		PushToken: input.PushToken,
 	})
 	if err != nil {
