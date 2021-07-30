@@ -239,14 +239,11 @@ func (s *service) CreatePost(ctx context.Context, req api.CreatePostReq) (*api.C
 		}
 		if err := s.adapter.NotificationModule.SendCommentNotification(ctx, post, *parent); err != nil {
 			s.adapter.LogModule.Log(err, req, "[CreatePost] failed send notification")
-			return nil, constants.ErrInternalServerError
 		}
 	} else {
-		s.adapter.NotificationModule.BroadcastNewPostNotification(ctx, entity.Post{
-			ID:   id,
-			Body: req.Body,
-			User: *user,
-		})
+		if err := s.adapter.NotificationModule.BroadcastNewPostNotification(ctx, post); err != nil {
+			s.adapter.LogModule.Log(err, req, "[CreatePost] failed send notification")
+		}
 	}
 
 	return &api.CreatePostRes{Message: "success"}, nil

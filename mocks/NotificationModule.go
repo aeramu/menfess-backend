@@ -29,8 +29,17 @@ func (_m *NotificationModule) AddPushToken(ctx context.Context, userID string, p
 }
 
 // BroadcastNewPostNotification provides a mock function with given fields: ctx, post
-func (_m *NotificationModule) BroadcastNewPostNotification(ctx context.Context, post entity.Post) {
-	_m.Called(ctx, post)
+func (_m *NotificationModule) BroadcastNewPostNotification(ctx context.Context, post entity.Post) error {
+	ret := _m.Called(ctx, post)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, entity.Post) error); ok {
+		r0 = rf(ctx, post)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // RemovePushToken provides a mock function with given fields: ctx, userID, pushToken

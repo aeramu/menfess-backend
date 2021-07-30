@@ -944,11 +944,45 @@ func Test_service_CreatePost(t *testing.T)  {
 				ctx: ctx,
 				req: req,
 			},
-			want:    nil,
-			wantErr: true,
+			want:   &api.CreatePostRes{Message: "success"},
+			wantErr: false,
 		},
 		{
-			name:    "success",
+			name:    "success reply post",
+			prepare: func() {
+				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
+					Return(&entity.User{ID: req.UserID}, nil)
+				mockPostModule.On("InsertPost", mock.Anything, mock.MatchedBy(func(p entity.Post) bool {
+					assert.Equal(t, req.Body, p.Body)
+					assert.Equal(t, req.AuthorID, p.Author.ID)
+					assert.Equal(t, req.UserID, p.User.ID)
+					return true
+				})).Return("post-id", nil)
+				mockNotificationModule.On("BroadcastNewPostNotification", mock.Anything, mock.MatchedBy(func(p entity.Post) bool {
+					assert.Equal(t, req.Body, p.Body)
+					assert.Equal(t, req.AuthorID, p.Author.ID)
+					assert.Equal(t, req.UserID, p.User.ID)
+					return true
+				})).
+					Return(err)
+				modifiedReq := req
+				modifiedReq.ParentID = ""
+				mockLogModule.On("Log", err, modifiedReq, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: api.CreatePostReq{
+					Body:     req.Body,
+					UserID:   req.UserID,
+					AuthorID: req.AuthorID,
+					ParentID: "",
+				},
+			},
+			want:    &api.CreatePostRes{Message: "success"},
+			wantErr: false,
+		},
+		{
+			name:    "success create post",
 			prepare: func() {
 				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
 					Return(&entity.User{ID: req.UserID}, nil)
