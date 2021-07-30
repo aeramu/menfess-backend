@@ -35,15 +35,10 @@ func (req LoginReq) Validate() error {
 	if req.Password == "" {
 		return constants.ErrInvalidPassword
 	}
-	//if req.PushToken == "" {
-	//	return constants.ErrInvalidPushToken
-	//}
 	return nil
 }
 
 type RegisterReq struct {
-	Email     string
-	Password  string
 	PushToken string
 }
 
@@ -52,16 +47,6 @@ type RegisterRes struct {
 }
 
 func (req RegisterReq) Validate() error {
-	req.Email = strings.ToLower(req.Email)
-	if err := utils.ValidateEmail(req.Email); err != nil {
-		return constants.ErrInvalidEmail
-	}
-	if req.Password == "" {
-		return constants.ErrInvalidPassword
-	}
-	//if req.PushToken == "" {
-	//	return constants.ErrInvalidPushToken
-	//}
 	return nil
 }
 

@@ -67,28 +67,7 @@ func (s *service) Register(ctx context.Context, req api.RegisterReq) (*api.Regis
 		return nil, err
 	}
 
-	if _, err := s.adapter.UserModule.FindUserByEmail(ctx, req.Email); err != nil {
-		if err != constants.ErrUserNotFound {
-			s.adapter.LogModule.Log(err, req, "[Register] failed find user from repo")
-			return nil, constants.ErrInternalServerError
-		}
-	} else {
-		return nil, constants.ErrEmailAlreadyRegistered
-	}
-
-	hash, err := s.adapter.AuthModule.HashPassword(ctx, req.Password)
-	if err != nil {
-		s.adapter.LogModule.Log(err, req, "[Register] failed hash password")
-		return nil, constants.ErrInternalServerError
-	}
-
-	user := entity.User{
-		Account: entity.Account{
-			Email:    req.Email,
-			Password: hash,
-		},
-	}
-
+	user := entity.User{}
 	id, err := s.adapter.UserModule.InsertUser(ctx, user)
 	if err != nil {
 		s.adapter.LogModule.Log(err, req, "[Register] failed insert user")
