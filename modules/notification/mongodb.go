@@ -82,7 +82,9 @@ type PushToken struct {
 
 func convertMapStringToArray(m map[string]bool) (arr []string) {
 	for key, _ := range m {
-		arr = append(arr, key)
+		if key != "" {
+			arr = append(arr, key)
+		}
 	}
 	return
 }
