@@ -19,6 +19,19 @@ func (m *notificationModule) findPushToken(ctx context.Context, userID string) (
 	return convertMapStringToArray(model.Token), nil
 }
 
+func (m *notificationModule) findAllPushToken(ctx context.Context) ([]string, error) {
+	var model []PushToken
+	err := m.pushToken.Query().Find(ctx).Consume(&model)
+	if err != nil {
+		return nil, err
+	}
+	var result []string
+	for _, v := range model {
+		result = append(result, convertMapStringToArray(v.Token)...)
+	}
+	return result, err
+}
+
 func (m *notificationModule) insertPushToken(ctx context.Context, userID string, token string) error {
 	var model PushToken
 	err := m.pushToken.Query().Equal("_id", mongolib.ObjectID(userID)).FindOne(ctx).Consume(&model)

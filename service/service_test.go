@@ -928,15 +928,21 @@ func Test_service_CreatePost(t *testing.T)  {
 			wantErr: true,
 		},
 		{
-			name:    "error when send notification",
+			name:    "error when send reply notification",
 			prepare: func() {
 				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
-					Return(&entity.User{}, nil)
+					Return(&entity.User{ID: "user-id"}, nil)
 				mockPostModule.On("InsertPost", mock.Anything, mock.Anything).
 					Return("post-id", nil)
 				mockPostModule.On("FindPostByID", mock.Anything, req.ParentID, "").
 					Return(&entity.Post{}, nil)
-				mockNotificationModule.On("SendCommentNotification", mock.Anything, mock.Anything, entity.Post{}).
+				mockNotificationModule.On("SendCommentNotification", mock.Anything, mock.MatchedBy(func(p entity.Post) bool {
+					assert.Equal(t, req.Body, p.Body)
+					assert.Equal(t, req.AuthorID, p.Author.ID)
+					assert.Equal(t, req.ParentID, p.Parent.ID)
+					assert.Equal(t, req.UserID, p.User.ID)
+					return true
+				}), entity.Post{}).
 					Return(err)
 				mockLogModule.On("Log", err, req, mock.Anything)
 			},
@@ -948,7 +954,7 @@ func Test_service_CreatePost(t *testing.T)  {
 			wantErr: false,
 		},
 		{
-			name:    "success reply post",
+			name:    "error when broadcast notification create post",
 			prepare: func() {
 				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
 					Return(&entity.User{ID: req.UserID}, nil)
@@ -977,36 +983,6 @@ func Test_service_CreatePost(t *testing.T)  {
 					AuthorID: req.AuthorID,
 					ParentID: "",
 				},
-			},
-			want:    &api.CreatePostRes{Message: "success"},
-			wantErr: false,
-		},
-		{
-			name:    "success create post",
-			prepare: func() {
-				mockUserModule.On("FindUserByID", mock.Anything, req.UserID).
-					Return(&entity.User{ID: req.UserID}, nil)
-				mockPostModule.On("InsertPost", mock.Anything, mock.MatchedBy(func(p entity.Post) bool {
-					assert.Equal(t, req.Body, p.Body)
-					assert.Equal(t, req.AuthorID, p.Author.ID)
-					assert.Equal(t, req.ParentID, p.Parent.ID)
-					assert.Equal(t, req.UserID, p.User.ID)
-					return true
-				})).Return("post-id", nil)
-				mockPostModule.On("FindPostByID", mock.Anything, req.ParentID, "").
-					Return(&entity.Post{}, nil)
-				mockNotificationModule.On("SendCommentNotification", mock.Anything, mock.MatchedBy(func(p entity.Post) bool {
-					assert.Equal(t, req.Body, p.Body)
-					assert.Equal(t, req.AuthorID, p.Author.ID)
-					assert.Equal(t, req.ParentID, p.Parent.ID)
-					assert.Equal(t, req.UserID, p.User.ID)
-					return true
-				}), entity.Post{}).
-					Return(nil)
-			},
-			args:    args{
-				ctx: ctx,
-				req: req,
 			},
 			want:    &api.CreatePostRes{Message: "success"},
 			wantErr: false,

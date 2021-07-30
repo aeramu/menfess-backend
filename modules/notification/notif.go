@@ -22,6 +22,7 @@ type notificationModule struct {
 const(
 	likeNotificationTitle = "%s like your post"
 	commentNotificationTitle = "%s comment on your post"
+	newPostNotificationTitle = "%s post a menfess"
 )
 
 func (m *notificationModule) AddPushToken(ctx context.Context, userID string, pushToken string) error {
@@ -77,8 +78,26 @@ func (m *notificationModule) SendCommentNotification(ctx context.Context, commen
 	return nil
 }
 
-func (m *notificationModule) BroadcastNewPostNotification(ctx context.Context, post entity.Post) {
-	panic("implement me")
+func (m *notificationModule) BroadcastNewPostNotification(ctx context.Context, post entity.Post) error {
+	tokens, err := m.findAllPushToken(ctx)
+	if err != nil {
+		return err
+	}
+
+	//if utils.RandomChance(50, 100) {
+	//	return nil
+	//}
+
+	if err := m.sendNotification(
+		tokens,
+		fmt.Sprintf(newPostNotificationTitle, post.User.Profile.Name),
+		post.Body,
+		Data{PostID: post.ID},
+	); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type Data struct {
