@@ -237,9 +237,27 @@ func Test_service_Register(t *testing.T)  {
 			wantErr: true,
 		},
 		{
+			name:    "error when add push token",
+			prepare: func() {
+				mockUserModule.On("InsertUser", mock.Anything, mock.Anything).
+					Return(user.ID, nil)
+				mockNotificationModule.On("AddPushToken", mock.Anything, user.ID, req.PushToken).
+					Return(err)
+				mockLogModule.On("Log", err, req, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
 			name:    "error when generate token",
 			prepare: func() {
 				mockUserModule.On("InsertUser", mock.Anything, entity.User{}).Return(user.ID, nil)
+				mockNotificationModule.On("AddPushToken", mock.Anything, user.ID, req.PushToken).
+					Return(nil)
 				mockAuthModule.On("GenerateToken", mock.Anything, user).
 					Return("", err)
 				mockLogModule.On("Log", err, req, mock.Anything)
@@ -255,6 +273,8 @@ func Test_service_Register(t *testing.T)  {
 			name:    "success",
 			prepare: func() {
 				mockUserModule.On("InsertUser", mock.Anything, entity.User{}).Return(user.ID, nil)
+				mockNotificationModule.On("AddPushToken", mock.Anything, user.ID, req.PushToken).
+					Return(nil)
 				mockAuthModule.On("GenerateToken", mock.Anything, user).
 					Return(token, nil)
 			},

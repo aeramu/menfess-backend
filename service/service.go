@@ -63,10 +63,6 @@ func (s *service) Login(ctx context.Context, req api.LoginReq) (*api.LoginRes, e
 }
 
 func (s *service) Register(ctx context.Context, req api.RegisterReq) (*api.RegisterRes, error) {
-	if err := req.Validate(); err != nil {
-		return nil, err
-	}
-
 	user := entity.User{}
 	id, err := s.adapter.UserModule.InsertUser(ctx, user)
 	if err != nil {
@@ -74,6 +70,11 @@ func (s *service) Register(ctx context.Context, req api.RegisterReq) (*api.Regis
 		return nil, constants.ErrInternalServerError
 	}
 	user.ID = id
+
+	if err := s.adapter.NotificationModule.AddPushToken(ctx, user.ID, req.PushToken); err != nil {
+		s.adapter.LogModule.Log(err, req, "[Login] failed add notification push token")
+		return nil, constants.ErrInternalServerError
+	}
 
 	token, err := s.adapter.AuthModule.GenerateToken(ctx, user)
 	if err != nil {
