@@ -3,7 +3,6 @@ package notification
 import (
 	"context"
 	"github.com/aeramu/mongolib"
-	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -26,7 +25,6 @@ func (m *notificationModule) findAllPushToken(ctx context.Context) ([]string, er
 	if err != nil {
 		return nil, err
 	}
-	logrus.Infoln("[findAllPushToken] model:", model)
 	var result []string
 	for _, v := range model {
 		result = append(result, convertMapStringToArray(v.Token)...)
