@@ -218,26 +218,35 @@ func (s *service) CreatePost(ctx context.Context, req api.CreatePostReq) (*api.C
 		return nil, constants.ErrInternalServerError
 	}
 
-	if _, err := s.adapter.PostModule.InsertPost(ctx, entity.Post{
+	post := entity.Post{
 		Body:         req.Body,
 		Parent:       &entity.Post{ID: req.ParentID},
 		Author:       entity.User{ID: req.AuthorID},
-		User:         entity.User{ID: req.UserID},
-	}); err != nil {
+		User:         *user,
+	}
+	id, err := s.adapter.PostModule.InsertPost(ctx, post)
+	if err != nil {
 		s.adapter.LogModule.Log(err, req, "[CreatePost] failed save post")
 		return nil, constants.ErrInternalServerError
 	}
+	post.ID = id
 
 	if req.ParentID != "" {
-		post, err := s.adapter.PostModule.FindPostByID(ctx, req.ParentID, "")
+		parent, err := s.adapter.PostModule.FindPostByID(ctx, req.ParentID, "")
 		if err != nil {
 			s.adapter.LogModule.Log(err, req, "[CreatePost] failed get post")
 			return nil, constants.ErrInternalServerError
 		}
-		if err := s.adapter.NotificationModule.SendCommentNotification(ctx, *user, *post); err != nil {
+		if err := s.adapter.NotificationModule.SendCommentNotification(ctx, post, *parent); err != nil {
 			s.adapter.LogModule.Log(err, req, "[CreatePost] failed send notification")
 			return nil, constants.ErrInternalServerError
 		}
+	} else {
+		s.adapter.NotificationModule.BroadcastNewPostNotification(ctx, entity.Post{
+			ID:   id,
+			Body: req.Body,
+			User: *user,
+		})
 	}
 
 	return &api.CreatePostRes{Message: "success"}, nil

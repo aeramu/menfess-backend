@@ -49,15 +49,6 @@ func TestLoginReq_Validate(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		{
-			name:    "empty push token",
-			fields:  fields{
-				Email:     "sulam3010@gmail.com",
-				Password:  "password",
-				PushToken: "",
-			},
-			wantErr: true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -117,15 +108,6 @@ func TestRegisterReq_Validate(t *testing.T) {
 				Email:     "sulam3010@gmail.com",
 				Password:  "",
 				PushToken: "sadf1234fas",
-			},
-			wantErr: true,
-		},
-		{
-			name:    "empty push token",
-			fields:  fields{
-				Email:     "sulam3010@gmail.com",
-				Password:  "password",
-				PushToken: "",
 			},
 			wantErr: true,
 		},

@@ -176,6 +176,29 @@ func (_m *Service) Login(ctx context.Context, req api.LoginReq) (*api.LoginRes, 
 	return r0, r1
 }
 
+// Logout provides a mock function with given fields: ctx, req
+func (_m *Service) Logout(ctx context.Context, req api.LogoutReq) (*api.LogoutRes, error) {
+	ret := _m.Called(ctx, req)
+
+	var r0 *api.LogoutRes
+	if rf, ok := ret.Get(0).(func(context.Context, api.LogoutReq) *api.LogoutRes); ok {
+		r0 = rf(ctx, req)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*api.LogoutRes)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, api.LogoutReq) error); ok {
+		r1 = rf(ctx, req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Register provides a mock function with given fields: ctx, req
 func (_m *Service) Register(ctx context.Context, req api.RegisterReq) (*api.RegisterRes, error) {
 	ret := _m.Called(ctx, req)

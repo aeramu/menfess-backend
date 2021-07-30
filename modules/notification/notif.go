@@ -59,22 +59,26 @@ func (m *notificationModule) SendLikeNotification(ctx context.Context, user enti
 	return nil
 }
 
-func (m *notificationModule) SendCommentNotification(ctx context.Context, user entity.User, post entity.Post) error {
-	tokens, err := m.findPushToken(ctx, post.User.ID)
+func (m *notificationModule) SendCommentNotification(ctx context.Context, comment entity.Post, parent entity.Post) error {
+	tokens, err := m.findPushToken(ctx, parent.User.ID)
 	if err != nil {
 		return err
 	}
 
 	if err := m.sendNotification(
 		tokens,
-		fmt.Sprintf(commentNotificationTitle, user.Profile.Name),
-		post.Body,
-		Data{PostID: post.ID},
+		fmt.Sprintf(commentNotificationTitle, comment.User.Profile.Name),
+		comment.Body,
+		Data{PostID: parent.ID},
 	); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (m *notificationModule) BroadcastNewPostNotification(ctx context.Context, post entity.Post) {
+	panic("implement me")
 }
 
 type Data struct {

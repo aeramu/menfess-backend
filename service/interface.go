@@ -45,7 +45,8 @@ type NotificationModule interface {
 	AddPushToken(ctx context.Context, userID string, pushToken string) error
 	RemovePushToken(ctx context.Context, userID string, pushToken string) error
 	SendLikeNotification(ctx context.Context, user entity.User, post entity.Post) error
-	SendCommentNotification(ctx context.Context, user entity.User, post entity.Post) error
+	SendCommentNotification(ctx context.Context, comment entity.Post, parent entity.Post) error
+	BroadcastNewPostNotification(ctx context.Context, post entity.Post)
 }
 
 type LogModule interface {
