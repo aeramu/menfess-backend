@@ -43,8 +43,6 @@ func (u *userModule) InsertUser(ctx context.Context, user entity.User) (string, 
 	id := mongolib.NewObjectID()
 	model := User{
 		ID:       id,
-		Email:    user.Account.Email,
-		Password: user.Account.Password,
 		Name:     user.Profile.Name,
 		Avatar:   user.Profile.Avatar,
 		Bio:      user.Profile.Bio,
@@ -59,8 +57,6 @@ func (u *userModule) InsertUser(ctx context.Context, user entity.User) (string, 
 func (u *userModule) SaveProfile(ctx context.Context, user entity.User) error {
 	model := User{
 		ID:       mongolib.ObjectID(user.ID),
-		Email:    user.Account.Email,
-		Password: user.Account.Password,
 		Name:     user.Profile.Name,
 		Avatar:   user.Profile.Avatar,
 		Bio:      user.Profile.Bio,
@@ -85,8 +81,6 @@ func (u *userModule) FindMenfessList(ctx context.Context) ([]entity.User, error)
 
 type User struct {
 	ID primitive.ObjectID `bson:"_id"`
-	Email string `bson:"email"`
-	Password string `bson:"password"`
 	Name string `bson:"name"`
 	Avatar string `bson:"avatar"`
 	Bio string `bson:"bio"`
@@ -96,10 +90,6 @@ type User struct {
 func (u User) Entity() *entity.User {
 	return &entity.User{
 		ID:      u.ID.Hex(),
-		Account: entity.Account{
-			Email:    u.Email,
-			Password: u.Password,
-		},
 		Profile: entity.Profile{
 			Name:   u.Name,
 			Avatar: u.Avatar,
