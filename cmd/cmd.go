@@ -21,7 +21,12 @@ func Run() {
 	if err != nil {
 		log.Fatalln("[Init DB Client]", err)
 	}
-	db := mongolib.NewDatabase(client, "menfess")
+	env := os.Getenv("ENV")
+	dbName := "menfess-staging"
+	if env == "PRODUCTION" {
+		dbName = "menfess"
+	}
+	db := mongolib.NewDatabase(client, dbName)
 	adapter := service.Adapter{
 		UserModule:         user.NewUserModule(db),
 		PostModule:         post.NewPostModule(db),
