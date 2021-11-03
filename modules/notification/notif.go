@@ -12,12 +12,12 @@ import (
 
 func NewNotificationModule(db *mongolib.Database) service.NotificationModule {
 	return &notificationModule{
-		pushToken: db.Coll("push_token"),
+		oldPushToken: db.Coll("old_push_token"),
 	}
 }
 
 type notificationModule struct {
-	pushToken *mongolib.Collection
+	oldPushToken *mongolib.Collection
 }
 
 const(
