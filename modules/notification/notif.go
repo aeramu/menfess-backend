@@ -50,6 +50,7 @@ func (m *notificationModule) SendLikeNotification(ctx context.Context, user enti
 	}
 
 	if err := m.sendNotification(
+		ctx,
 		tokens,
 		fmt.Sprintf(likeNotificationTitle, user.Profile.Name),
 		post.Body,
@@ -68,6 +69,7 @@ func (m *notificationModule) SendCommentNotification(ctx context.Context, commen
 	}
 
 	if err := m.sendNotification(
+		ctx,
 		tokens,
 		fmt.Sprintf(commentNotificationTitle, comment.User.Profile.Name),
 		comment.Body,
@@ -97,6 +99,7 @@ func (m *notificationModule) BroadcastNewPostNotification(ctx context.Context, p
 	}
 
 	if err := m.sendNotification(
+		ctx,
 		tokens,
 		fmt.Sprintf(newPostNotificationTitle),
 		post.Body,
