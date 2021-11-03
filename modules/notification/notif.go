@@ -80,12 +80,19 @@ func (m *notificationModule) SendCommentNotification(ctx context.Context, commen
 }
 
 func (m *notificationModule) BroadcastNewPostNotification(ctx context.Context, post entity.Post) error {
-	tokens, err := m.findAllPushToken(ctx)
+	pushTokens, err := m.findAllPushToken(ctx)
 	if err != nil {
 		return err
 	}
 
-	if utils.RandomChance(50, 100) {
+	var tokens []string
+	for _, v := range pushTokens {
+		if v.ID.Hex() != post.User.ID {
+			tokens = append(tokens, convertMapStringToArray(v.Token)...)
+		}
+	}
+
+	if utils.RandomChance(100, 100) {
 		return nil
 	}
 
