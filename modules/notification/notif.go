@@ -92,7 +92,7 @@ func (m *notificationModule) BroadcastNewPostNotification(ctx context.Context, p
 		}
 	}
 
-	if utils.RandomChance(100, 100) {
+	if !utils.RandomChance(100, 100) {
 		return nil
 	}
 
