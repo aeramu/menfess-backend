@@ -168,6 +168,8 @@ func (s *service) GetPostList(ctx context.Context, req api.GetPostListReq) (*api
 		return nil, err
 	}
 
+	s.adapter.LogModule.Log(nil, nil, "Haloooo")
+
 	postList, pagination, err := s.adapter.PostModule.FindPostListByParentIDAndAuthorIDs(ctx,
 		req.ParentID,
 		req.AuthorIDs,
