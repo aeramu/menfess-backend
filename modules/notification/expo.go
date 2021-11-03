@@ -51,7 +51,7 @@ func (m *notificationModule) sendNotification(_ context.Context, tokens []string
 func (m *notificationModule) processNotificationResponse(ctx context.Context, resp notificationResponse, tokens []string) {
 	for i, v := range resp.Data {
 		if v.Status == "ok" {
-			break
+			continue
 		}
 		if v.Details.Error == "DeviceNotRegistered" {
 			err := m.pushToken.Query().Equal("token", tokens[i]).DeleteMany(ctx)
