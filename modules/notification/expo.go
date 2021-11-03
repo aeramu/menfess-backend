@@ -14,7 +14,7 @@ const (
 	contentType = "application/json"
 )
 
-func (m *notificationModule) sendNotification(ctx context.Context, tokens []string, title, body string, data interface{}) error {
+func (m *notificationModule) sendNotification(_ context.Context, tokens []string, title, body string, data interface{}) error {
 	req := notificationRequest{
 		To:    tokens,
 		Title: title,
@@ -42,7 +42,7 @@ func (m *notificationModule) sendNotification(ctx context.Context, tokens []stri
 			logrus.Errorln("[SendNotification] Failed unmarshall response:", err)
 			return
 		}
-		m.processNotificationResponse(ctx, resp, tokens)
+		m.processNotificationResponse(context.Background(), resp, tokens)
 	}()
 
 	return nil
