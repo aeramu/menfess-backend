@@ -12,12 +12,12 @@ import (
 
 func NewNotificationModule(db *mongolib.Database) service.NotificationModule {
 	return &notificationModule{
-		oldPushToken: db.Coll("old_push_token"),
+		pushToken: db.Coll("push_token"),
 	}
 }
 
 type notificationModule struct {
-	oldPushToken *mongolib.Collection
+	pushToken    *mongolib.Collection
 }
 
 const(
@@ -89,8 +89,8 @@ func (m *notificationModule) BroadcastNewPostNotification(ctx context.Context, p
 
 	var tokens []string
 	for _, v := range pushTokens {
-		if v.ID.Hex() != post.User.ID {
-			tokens = append(tokens, convertMapStringToArray(v.Token)...)
+		if v.UserID.Hex() != post.User.ID {
+			tokens = append(tokens, v.Token)
 		}
 	}
 

@@ -7,21 +7,23 @@ import (
 )
 
 func (m *notificationModule) findPushToken(ctx context.Context, userID string) ([]string, error){
-	var model OldPushToken
-	err := m.oldPushToken.Query().Equal("_id", mongolib.ObjectID(userID)).FindOne(ctx).Consume(&model)
+	var models []PushToken
+	err := m.pushToken.Query().Equal("user_id", mongolib.ObjectID(userID)).Find(ctx).Consume(&models)
 	if err != nil {
-		if err == mongolib.ErrNotFound {
-			return []string{}, nil
-		}
 		return nil, err
 	}
 
-	return convertMapStringToArray(model.Token), nil
+	result := make([]string, len(models))
+	for i, v := range models {
+		result[i] = v.Token
+	}
+
+	return result, nil
 }
 
-func (m *notificationModule) findAllPushToken(ctx context.Context) ([]OldPushToken, error) {
-	var model []OldPushToken
-	err := m.oldPushToken.Query().Find(ctx).Consume(&model)
+func (m *notificationModule) findAllPushToken(ctx context.Context) ([]PushToken, error) {
+	var model []PushToken
+	err := m.pushToken.Query().Find(ctx).Consume(&model)
 	if err != nil {
 		return nil, err
 	}
@@ -30,56 +32,42 @@ func (m *notificationModule) findAllPushToken(ctx context.Context) ([]OldPushTok
 }
 
 func (m *notificationModule) insertPushToken(ctx context.Context, userID string, token string) error {
-	var model OldPushToken
-	err := m.oldPushToken.Query().Equal("_id", mongolib.ObjectID(userID)).FindOne(ctx).Consume(&model)
-	if err != nil {
-		if err == mongolib.ErrNotFound {
-			model.ID = mongolib.ObjectID(userID)
-			model.Token = map[string]bool{}
-		} else {
-			return err
-		}
+	var model PushToken
+	err := m.pushToken.Query().
+		Equal("user_id", mongolib.ObjectID(userID)).
+		Equal("token", token).
+		FindOne(ctx).Consume(&model)
+	if err == nil {
+		return nil
+	}
+	if err != mongolib.ErrNotFound{
+		return err
 	}
 
-	_, ok := model.Token[token]
-	if !ok {
-		model.Token[token] = true
-		if err := m.oldPushToken.Save(ctx, model.ID, model); err != nil {
-			return err
-		}
+	model.ID = mongolib.NewObjectID()
+	model.Token = token
+	model.UserID = mongolib.ObjectID(userID)
+	if err := m.pushToken.Save(ctx, model.ID, model); err != nil {
+		return err
 	}
 
 	return nil
 }
 
 func (m *notificationModule) removePushToken(ctx context.Context, userID string, token string) error {
-	var model OldPushToken
-	err := m.oldPushToken.Query().Equal("_id", mongolib.ObjectID(userID)).FindOne(ctx).Consume(&model)
+	err := m.oldPushToken.Query().
+		Equal("user_id", mongolib.ObjectID(userID)).
+		Equal("token", token).
+		DeleteOne(ctx)
 	if err != nil {
 		return err
-	}
-
-	_, ok := model.Token[token]
-	if ok {
-		delete(model.Token, token)
-		if err := m.oldPushToken.Save(ctx, model.ID, model); err != nil {
-			return err
-		}
 	}
 
 	return nil
 }
 
-type OldPushToken struct {
-	ID    primitive.ObjectID `bson:"_id"`
-	Token map[string]bool    `bson:"token"`
-}
-
-func convertMapStringToArray(m map[string]bool) (arr []string) {
-	for key, _ := range m {
-		if key != "" {
-			arr = append(arr, key)
-		}
-	}
-	return
+type PushToken struct {
+	ID     primitive.ObjectID `bson:"_id"`
+	UserID primitive.ObjectID `bson:"user_id"`
+	Token  string             `bson:"token"`
 }
