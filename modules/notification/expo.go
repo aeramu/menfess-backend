@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -55,7 +54,10 @@ func (m *notificationModule) processNotificationResponse(ctx context.Context, re
 			break
 		}
 		if v.Details.Error == "DeviceNotRegistered" {
-			fmt.Print(i)
+			err := m.pushToken.Query().Equal("token", tokens[i]).DeleteMany(ctx)
+			if err != nil {
+				logrus.Errorln("Failed delete invalid expo token, err:", err)
+			}
 		}
 	}
 }

@@ -55,7 +55,7 @@ func (m *notificationModule) insertPushToken(ctx context.Context, userID string,
 }
 
 func (m *notificationModule) removePushToken(ctx context.Context, userID string, token string) error {
-	err := m.oldPushToken.Query().
+	err := m.pushToken.Query().
 		Equal("user_id", mongolib.ObjectID(userID)).
 		Equal("token", token).
 		DeleteOne(ctx)
