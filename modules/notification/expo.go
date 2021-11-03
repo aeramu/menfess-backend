@@ -59,6 +59,7 @@ func (m *notificationModule) processNotificationResponse(ctx context.Context, re
 				logrus.Errorln("Failed delete invalid expo token, err:", err)
 			}
 		}
+		logrus.Errorln("Expo token error, token:", tokens[i], v.Details.Error)
 	}
 }
 
