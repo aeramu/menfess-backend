@@ -105,17 +105,16 @@ func (r *Resolver) Menfess(ctx context.Context) MenfessResponse {
 func (r *Resolver) Avatars(ctx context.Context) AvatarsResponse {
 	return AvatarsResponse{
 		Payload: []string{
-			"https://qiup-image.s3.amazonaws.com/avatar/avatar.jpg",
-			"https://qiup-image.s3.amazonaws.com/avatar/batman.jpg",
-			"https://qiup-image.s3.amazonaws.com/avatar/spiderman.jpg",
-			"https://qiup-image.s3.amazonaws.com/avatar/saitama.jpg",
-			"https://qiup-image.s3.amazonaws.com/avatar/kaonashi.jpg",
-			"https://qiup-image.s3.amazonaws.com/avatar/mrbean.jpg",
-			"https://qiup-image.s3.amazonaws.com/avatar/upin.jpg",
-			"https://qiup-image.s3.amazonaws.com/avatar/ipin.jpg",
-			"https://qiup-image.s3.amazonaws.com/avatar/einstein.jpg",
-			"https://qiup-image.s3.amazonaws.com/avatar/monalisa.jpg",
-			"https://qiup-image.s3.amazonaws.com/avatar/ronald.jpg",
+			"https://i.ibb.co/R2xRyg3/upin.jpg",
+			"https://i.ibb.co/4jRdmh5/spiderman.jpg",
+			"https://i.ibb.co/3pDTY1f/saitama.jpg",
+			"https://i.ibb.co/WsK9bLP/ronald.jpg",
+			"https://i.ibb.co/xMXNWBj/mrbean.jpg",
+			"https://i.ibb.co/72TNcHd/monalisa.jpg",
+			"https://i.ibb.co/t2M7zY5/kaonashi.jpg",
+			"https://i.ibb.co/Gv5RSgs/ipin.jpg",
+			"https://i.ibb.co/Vmm19Q4/einstein.jpg",
+			"https://i.ibb.co/84ypfNc/batman.jpg",
 		},
 		Error: NoError,
 	}
