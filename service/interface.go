@@ -26,6 +26,8 @@ type UserModule interface {
 	InsertUser(ctx context.Context, user entity.User) (string, error)
 	SaveProfile(ctx context.Context, user entity.User) error
 	FindMenfessList(ctx context.Context) ([]entity.User, error)
+	GetFollowedUserID(ctx context.Context, userID string) ([]string, error)
+	UpdateFollowStatus(ctx context.Context, follower, followed, status string) error
 }
 
 type PostModule interface {

@@ -201,3 +201,22 @@ func (req LogoutReq) Validate() error {
 	}
 	return nil
 }
+
+type FollowUserReq struct {
+	UserID string
+	FollowedID string
+}
+
+type FollowUserRes struct {
+	Message string
+}
+
+func (req FollowUserReq) Validate() error {
+	if req.UserID == "" {
+		return constants.ErrInvalidUserID
+	}
+	if req.FollowedID == "" {
+		return constants.ErrInvalidFollowedID
+	}
+	return nil
+}

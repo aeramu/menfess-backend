@@ -8,6 +8,7 @@ var (
 	ErrUserNotFound = errors.New("user not found")
 	ErrInvalidID = errors.New("id is not valid")
 	ErrInvalidUserID = errors.New("user id is not valid")
+	ErrInvalidFollowedID = errors.New("followed id is not valid")
 	ErrInvalidEmail = errors.New("email is not valid")
 	ErrEmailAlreadyRegistered = errors.New("email already registered")
 	ErrInvalidPassword = errors.New("password is not valid")

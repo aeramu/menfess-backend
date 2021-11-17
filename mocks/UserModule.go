@@ -83,6 +83,29 @@ func (_m *UserModule) FindUserByID(ctx context.Context, id string) (*entity.User
 	return r0, r1
 }
 
+// GetFollowedUserID provides a mock function with given fields: ctx, userID
+func (_m *UserModule) GetFollowedUserID(ctx context.Context, userID string) ([]string, error) {
+	ret := _m.Called(ctx, userID)
+
+	var r0 []string
+	if rf, ok := ret.Get(0).(func(context.Context, string) []string); ok {
+		r0 = rf(ctx, userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // InsertUser provides a mock function with given fields: ctx, user
 func (_m *UserModule) InsertUser(ctx context.Context, user entity.User) (string, error) {
 	ret := _m.Called(ctx, user)
@@ -111,6 +134,20 @@ func (_m *UserModule) SaveProfile(ctx context.Context, user entity.User) error {
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, entity.User) error); ok {
 		r0 = rf(ctx, user)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UpdateFollowStatus provides a mock function with given fields: ctx, follower, followed, status
+func (_m *UserModule) UpdateFollowStatus(ctx context.Context, follower string, followed string, status string) error {
+	ret := _m.Called(ctx, follower, followed, status)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) error); ok {
+		r0 = rf(ctx, follower, followed, status)
 	} else {
 		r0 = ret.Error(0)
 	}

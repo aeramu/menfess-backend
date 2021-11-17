@@ -269,3 +269,28 @@ func (s *service) LikePost(ctx context.Context, req api.LikePostReq) (*api.LikeP
 
 	return &api.LikePostRes{Message: "success"}, nil
 }
+
+func (s *service) FollowUser(ctx context.Context, req api.FollowUserReq) (*api.FollowUserRes, error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	followed, err := s.adapter.UserModule.GetFollowedUserID(ctx, req.UserID)
+	if err != nil {
+		s.adapter.LogModule.Log(err, req, "[FollowUser] failed get followed user")
+		return nil, constants.ErrInternalServerError
+	}
+
+	status := constants.FollowStatusActive
+	for _, v := range followed {
+		if req.FollowedID == v {
+			status = constants.FollowStatusInactive
+		}
+	}
+
+	if err := s.adapter.UserModule.UpdateFollowStatus(ctx, req.UserID, req.FollowedID, status); err != nil {
+		s.adapter.LogModule.Log(err, req, "[FollowUser] failed update follow status")
+		return nil, constants.ErrInternalServerError
+	}
+	return &api.FollowUserRes{Message: "success"}, nil
+}

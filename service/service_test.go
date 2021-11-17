@@ -1211,3 +1211,118 @@ func Test_service_Logout(t *testing.T)  {
 		})
 	}
 }
+
+func Test_service_FollowUser(t *testing.T)  {
+	var (
+		ctx = context.Background()
+		userID = "user-id"
+		followedID = "followed-id"
+	)
+	type args struct {
+		ctx context.Context
+		req api.FollowUserReq
+	}
+	tests := []struct {
+		name    string
+		prepare func()
+		args    args
+		want    *api.FollowUserRes
+		wantErr bool
+	}{
+		{
+			name:    "invalid request",
+			prepare: nil,
+			args:    args{
+				ctx: ctx,
+				req: api.FollowUserReq{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error get followed user",
+			prepare: func() {
+				mockUserModule.On("GetFollowedUserID", mock.Anything, userID).
+					Return(nil, errors.New("err"))
+				mockLogModule.On("Log", mock.Anything, mock.Anything, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: api.FollowUserReq{
+					UserID:     userID,
+					FollowedID: followedID,
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "error update follow status",
+			prepare: func() {
+				mockUserModule.On("GetFollowedUserID", mock.Anything, userID).
+					Return(nil, nil)
+				mockUserModule.On("UpdateFollowStatus", mock.Anything, userID, followedID, constants.FollowStatusActive).
+					Return(errors.New("err"))
+				mockLogModule.On("Log", mock.Anything, mock.Anything, mock.Anything)
+			},
+			args:    args{},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "success update follow status: active",
+			prepare: func() {
+				mockUserModule.On("GetFollowedUserID", mock.Anything, userID).
+					Return(nil, nil)
+				mockUserModule.On("UpdateFollowStatus", mock.Anything, userID, followedID, constants.FollowStatusActive).
+					Return(nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: api.FollowUserReq{
+					UserID:     userID,
+					FollowedID: followedID,
+				},
+			},
+			want:    &api.FollowUserRes{Message: "success"},
+			wantErr: false,
+		},
+		{
+			name:    "success update follow status: inactive",
+			prepare: func() {
+				mockUserModule.On("GetFollowedUserID", mock.Anything, userID).
+					Return([]string{followedID}, nil)
+				mockUserModule.On("UpdateFollowStatus", mock.Anything, userID, followedID, constants.FollowStatusInactive).
+					Return(nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: api.FollowUserReq{
+					UserID:     userID,
+					FollowedID: followedID,
+				},
+			},
+			want:    &api.FollowUserRes{Message: "success"},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			initTest()
+			if tt.prepare != nil {
+				tt.prepare()
+			}
+			s := &service{
+				adapter: adapter,
+			}
+			got, err := s.FollowUser(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, got)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.want, got)
+			}
+		})
+	}
+}
