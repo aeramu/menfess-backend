@@ -145,6 +145,27 @@ func (req *GetPostListReq) Validate() error {
 	return nil
 }
 
+type FeedReq struct {
+	UserID     string
+	Type       string
+	Pagination PaginationReq
+}
+
+type FeedRes struct {
+	PostList   []entity.Post
+	Pagination PaginationRes
+}
+
+func (req FeedReq) Validate() error {
+	if req.Type != constants.FeedTypeAll && req.Type != constants.FeedTypeFollow {
+		return constants.ErrInvalidFeedType
+	}
+	if req.Pagination.First < 1 {
+		req.Pagination.First = 20
+	}
+	return nil
+}
+
 type CreatePostReq struct {
 	Body     string
 	UserID   string

@@ -1285,7 +1285,13 @@ func Test_service_FollowUser(t *testing.T)  {
 					Return(errors.New("err"))
 				mockLogModule.On("Log", mock.Anything, mock.Anything, mock.Anything)
 			},
-			args:    args{},
+			args:    args{
+				ctx: ctx,
+				req: api.FollowUserReq{
+					UserID:     userID,
+					FollowedID: followedID,
+				},
+			},
 			want:    nil,
 			wantErr: true,
 		},
@@ -1336,6 +1342,122 @@ func Test_service_FollowUser(t *testing.T)  {
 				adapter: adapter,
 			}
 			got, err := s.FollowUser(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, got)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.want, got)
+			}
+		})
+	}
+}
+
+func Test_service_Feed(t *testing.T)  {
+	var (
+		ctx = context.Background()
+		reqAll = api.FeedReq{
+			UserID:     "id",
+			Type:       "all",
+			Pagination: api.PaginationReq{},
+		}
+		reqFollow = api.FeedReq{
+			UserID:     "id",
+			Type:       "follow",
+			Pagination: api.PaginationReq{},
+		}
+	)
+	type args struct {
+		ctx context.Context
+		req api.FeedReq
+	}
+	tests := []struct {
+		name    string
+		prepare func()
+		args    args
+		want    *api.FeedRes
+		wantErr bool
+	}{
+		{
+			name:    "invalid request",
+			prepare: nil,
+			args:    args{},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "type follow, error get followed ids",
+			prepare: func() {
+				mockUserModule.On("GetFollowedUserID", mock.Anything, reqFollow.UserID).
+					Return(nil, errors.New("err"))
+				mockLogModule.On("Log", mock.Anything, reqFollow, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: reqFollow,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "type all, error get post list",
+			prepare: func() {
+				mockPostModule.On("FindPostListByParentIDAndAuthorIDs", mock.Anything, "", mock.Anything, reqAll.UserID, reqAll.Pagination).
+					Return(nil, nil, errors.New("err"))
+				mockLogModule.On("Log", mock.Anything, reqAll, mock.Anything)
+			},
+			args:    args{
+				ctx: ctx,
+				req: reqAll,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "success, type follow",
+			prepare: func() {
+				mockUserModule.On("GetFollowedUserID", mock.Anything, reqFollow.UserID).
+					Return([]string{"id"}, nil)
+				mockPostModule.On("FindPostListByParentIDAndAuthorIDs", mock.Anything, "", []string{"id"}, reqFollow.UserID, reqFollow.Pagination).
+					Return([]entity.Post{}, &api.PaginationRes{}, nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: reqFollow,
+			},
+			want:    &api.FeedRes{
+				PostList:   []entity.Post{},
+				Pagination: api.PaginationRes{},
+			},
+			wantErr: false,
+		},
+		{
+			name:    "success, type all",
+			prepare: func() {
+				mockPostModule.On("FindPostListByParentIDAndAuthorIDs", mock.Anything, "", mock.Anything, reqAll.UserID, reqAll.Pagination).
+					Return([]entity.Post{}, &api.PaginationRes{}, nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: reqAll,
+			},
+			want:    &api.FeedRes{
+				PostList:   []entity.Post{},
+				Pagination: api.PaginationRes{},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			initTest()
+			if tt.prepare != nil {
+				tt.prepare()
+			}
+			s := &service{
+				adapter: adapter,
+			}
+			got, err := s.Feed(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				assert.Error(t, err)
 				assert.Nil(t, got)

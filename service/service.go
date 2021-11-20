@@ -301,3 +301,34 @@ func (s *service) FollowUser(ctx context.Context, req api.FollowUserReq) (*api.F
 	}
 	return &api.FollowUserRes{Message: "success"}, nil
 }
+
+func (s *service) Feed(ctx context.Context, req api.FeedReq) (*api.FeedRes, error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	var followed []string
+	if req.Type == constants.FeedTypeFollow {
+		userIDs, err := s.adapter.UserModule.GetFollowedUserID(ctx, req.UserID)
+		if err != nil {
+			s.adapter.LogModule.Log(err, req, "[Feed] failed get followed user")
+			return nil, constants.ErrInternalServerError
+		}
+		followed = userIDs
+	}
+
+	postList, pagination, err := s.adapter.PostModule.FindPostListByParentIDAndAuthorIDs(ctx,
+		"",
+		followed,
+		req.UserID,
+		req.Pagination)
+	if err != nil {
+		s.adapter.LogModule.Log(err, req, "[GetPostList] failed get post list")
+		return nil, constants.ErrInternalServerError
+	}
+
+	return &api.FeedRes{
+		PostList:   postList,
+		Pagination: *pagination,
+	}, nil
+}

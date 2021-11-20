@@ -20,4 +20,6 @@ var (
 	ErrPostNotFound = errors.New("post not found")
 	ErrInvalidPostID = errors.New("post id is not valid")
 	ErrInvalidBody = errors.New("body is not valid")
+
+	ErrInvalidFeedType = errors.New("invalid feed type")
 )

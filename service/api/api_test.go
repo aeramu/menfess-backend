@@ -486,3 +486,47 @@ func TestLogoutReq_Validate(t *testing.T) {
 		})
 	}
 }
+
+func TestFeedReq_Validate(t *testing.T) {
+	type fields struct {
+		UserID     string
+		Type       string
+		Pagination PaginationReq
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		{
+			name:    "success",
+			fields:  fields{
+				UserID:     "id",
+				Type:       "all",
+				Pagination: PaginationReq{},
+			},
+			wantErr: false,
+		},
+		{
+			name:    "invalid type",
+			fields:  fields{
+				UserID:     "id",
+				Type:       "allType",
+				Pagination: PaginationReq{},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := FeedReq{
+				UserID:     tt.fields.UserID,
+				Type:       tt.fields.Type,
+				Pagination: tt.fields.Pagination,
+			}
+			if err := req.Validate(); (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
