@@ -11,6 +11,7 @@ type Mutation {
 
     """ Profile """
     updateProfile(name: String!, avatar: String!, bio: String!): BasicMutationResponse!
+    follow(userID: ID!): BasicMutationResponse!
 
     """ Post """
     createPost(body: String!, authorID: ID, parentID: ID): BasicMutationResponse!

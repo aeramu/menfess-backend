@@ -143,3 +143,25 @@ func (r *Resolver) LikePost(ctx context.Context, input struct{
 	}
 }
 
+func (r *Resolver) Follow(ctx context.Context, input struct{
+	UserID graphql.ID
+}) BasicMutationResponse {
+	token, err := DecodeToken(ctx)
+	if err != nil {
+		return BasicMutationResponse{
+			Error:   Error(err),
+		}
+	}
+	res, err := r.svc.FollowUser(ctx, api.FollowUserReq{
+		UserID:     token.UserID,
+		FollowedID: string(input.UserID),
+	})
+	if err != nil {
+		return BasicMutationResponse{Error: Error(err)}
+	}
+	return BasicMutationResponse{
+		Message: res.Message,
+		Error:   NoError,
+	}
+}
+

@@ -13,6 +13,7 @@ type Service interface {
 	Logout(ctx context.Context, req api.LogoutReq) (*api.LogoutRes, error)
 	UpdateProfile(ctx context.Context, req api.UpdateProfileReq) (*api.UpdateProfileRes, error)
 	GetUser(ctx context.Context, req api.GetUserReq) (*api.GetUserRes, error)
+	FollowUser(ctx context.Context, req api.FollowUserReq) (*api.FollowUserRes, error)
 	GetMenfessList(ctx context.Context, req api.GetMenfessListReq) (*api.GetMenfessListRes, error)
 	GetPost(ctx context.Context, req api.GetPostReq) (*api.GetPostRes, error)
 	GetPostList(ctx context.Context, req api.GetPostListReq) (*api.GetPostListRes, error)
