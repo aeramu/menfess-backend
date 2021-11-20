@@ -79,12 +79,44 @@ func (u *userModule) FindMenfessList(ctx context.Context) ([]entity.User, error)
 	return model.Entity(), nil
 }
 
+func (u *userModule) GetFollowedUserID(ctx context.Context, userID string) ([]string, error) {
+	var model User
+	if err := u.user.FindByID(ctx, mongolib.ObjectID(userID)).Consume(&model); err != nil {
+		return nil, err
+	}
+	result := make([]string, len(model.Follow))
+	for i, v := range model.Follow {
+		result[i] = v.Hex()
+	}
+	return result, nil
+}
+
+func (u *userModule) UpdateFollowStatus(ctx context.Context, follower, followed, status string) error {
+	if status == constants.FollowStatusActive {
+		if err := u.user.Query().
+			Equal("_id", mongolib.ObjectID(follower)).
+			Push("follow", mongolib.ObjectID(followed)).
+			Update(ctx); err != nil {
+				return err
+		}
+	} else {
+		if err := u.user.Query().
+			Equal("_id", mongolib.ObjectID(follower)).
+			Pull("follow", mongolib.ObjectID(followed)).
+			Update(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 type User struct {
-	ID primitive.ObjectID `bson:"_id"`
-	Name string `bson:"name"`
-	Avatar string `bson:"avatar"`
-	Bio string `bson:"bio"`
-	Type string `bson:"type"`
+	ID     primitive.ObjectID   `bson:"_id"`
+	Name   string               `bson:"name"`
+	Avatar string               `bson:"avatar"`
+	Bio    string               `bson:"bio"`
+	Type   string               `bson:"type"`
+	Follow []primitive.ObjectID `bson:"follow"`
 }
 
 func (u User) Entity() *entity.User {
