@@ -8,10 +8,11 @@ import (
 )
 
 type User struct {
-	ID     graphql.ID
-	Name   string
-	Avatar string
-	Bio    string
+	ID         graphql.ID
+	Name       string
+	Avatar     string
+	Bio        string
+	IsFollowed bool
 }
 
 type UserEdge struct {
@@ -24,20 +25,25 @@ type UserConnection struct {
 	PageInfo PageInfo
 }
 
-func ResolveUser(user entity.User) User {
+func ResolveUser(user entity.User, isFollowed bool) User {
 	return User{
-		ID:     graphql.ID(user.ID),
-		Name:   user.Profile.Name,
-		Avatar: user.Profile.Avatar,
-		Bio:    user.Profile.Bio,
+		ID:         graphql.ID(user.ID),
+		Name:       user.Profile.Name,
+		Avatar:     user.Profile.Avatar,
+		Bio:        user.Profile.Bio,
+		IsFollowed: isFollowed,
 	}
 }
 
-func ResolveUserEdges(posts []entity.User) []UserEdge {
+func ResolveUserEdges(users []entity.User, followedIDs []string) []UserEdge {
+	mapFollowed := make(map[string]bool)
+	for _, v := range followedIDs {
+		mapFollowed[v] = true
+	}
 	var edges []UserEdge
-	for _, v := range posts {
+	for _, v := range users {
 		edges = append(edges, UserEdge{
-			Node:   ResolveUser(v),
+			Node:   ResolveUser(v, mapFollowed[v.ID]),
 			Cursor: graphql.ID(v.ID),
 		})
 	}
@@ -103,7 +109,7 @@ func ResolvePost(r *Resolver, post entity.Post) Post {
 		ID:           graphql.ID(post.ID),
 		Body:         post.Body,
 		Timestamp:    int32(post.Timestamp),
-		Author:       ResolveUser(post.Author),
+		Author:       ResolveUser(post.Author, false),
 		LikesCount:   int32(post.LikesCount),
 		RepliesCount: int32(post.RepliesCount),
 		IsLiked:      post.IsLiked,

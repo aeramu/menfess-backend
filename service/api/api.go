@@ -92,10 +92,12 @@ func (req GetUserReq) Validate() error {
 }
 
 type GetMenfessListReq struct {
+	UserID string
 }
 
 type GetMenfessListRes struct {
 	MenfessList []entity.User
+	FollowedIDs []string
 }
 
 func (req GetMenfessListReq) Validate() error {

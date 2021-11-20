@@ -502,7 +502,9 @@ func Test_service_GetUser(t *testing.T)  {
 func Test_service_GetMenfessList(t *testing.T)  {
 	var (
 		ctx = context.Background()
-		req = api.GetMenfessListReq{}
+		req = api.GetMenfessListReq{
+			UserID: "id",
+		}
 		err = errors.New("some error")
 	)
 	type args struct {
@@ -531,16 +533,34 @@ func Test_service_GetMenfessList(t *testing.T)  {
 			wantErr: true,
 		},
 		{
-			name:    "success",
+			name:    "error when get followed ids",
 			prepare: func() {
 				mockUserModule.On("FindMenfessList", mock.Anything).
 					Return([]entity.User{}, nil)
+				mockUserModule.On("GetFollowedUserID", mock.Anything, req.UserID).
+					Return(nil, err)
+				mockLogModule.On("Log", err, req, mock.Anything)
 			},
 			args:    args{
 				ctx: ctx,
 				req: req,
 			},
-			want:    &api.GetMenfessListRes{MenfessList: []entity.User{}},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "success",
+			prepare: func() {
+				mockUserModule.On("FindMenfessList", mock.Anything).
+					Return([]entity.User{}, nil)
+				mockUserModule.On("GetFollowedUserID", mock.Anything, req.UserID).
+					Return([]string{}, nil)
+			},
+			args:    args{
+				ctx: ctx,
+				req: req,
+			},
+			want:    &api.GetMenfessListRes{MenfessList: []entity.User{}, FollowedIDs: []string{}},
 			wantErr: false,
 		},
 	}

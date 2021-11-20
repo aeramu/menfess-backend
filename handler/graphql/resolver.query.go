@@ -90,13 +90,17 @@ func (r *Resolver) Me(ctx context.Context) MeResponse {
 }
 
 func (r *Resolver) Menfess(ctx context.Context) MenfessResponse {
-	res, err := r.svc.GetMenfessList(ctx, api.GetMenfessListReq{})
+	token, err := DecodeToken(ctx)
+	if err != nil {
+		token = &Token{}
+	}
+	res, err := r.svc.GetMenfessList(ctx, api.GetMenfessListReq{UserID: token.UserID})
 	if err != nil {
 		return MenfessResponse{Error: Error(err)}
 	}
 	return MenfessResponse{
 		Payload: UserConnection{
-			Edges: ResolveUserEdges(res.MenfessList),
+			Edges: ResolveUserEdges(res.MenfessList, res.FollowedIDs),
 		},
 		Error: NoError,
 	}

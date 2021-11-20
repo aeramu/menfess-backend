@@ -93,6 +93,7 @@ type User {
     name: String!
     avatar: String!
     bio: String!
+    isFollowed: Boolean!
 }
 
 type UserConnection {

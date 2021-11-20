@@ -144,7 +144,13 @@ func (s *service) GetMenfessList(ctx context.Context, req api.GetMenfessListReq)
 		return nil, constants.ErrInternalServerError
 	}
 
-	return &api.GetMenfessListRes{MenfessList: menfessList}, nil
+	followed, err := s.adapter.UserModule.GetFollowedUserID(ctx, req.UserID)
+	if err != nil {
+		s.adapter.LogModule.Log(err, req, "[FollowUser] failed get followed user")
+		return nil, constants.ErrInternalServerError
+	}
+
+	return &api.GetMenfessListRes{MenfessList: menfessList, FollowedIDs: followed}, nil
 }
 
 func (s *service) GetPost(ctx context.Context, req api.GetPostReq) (*api.GetPostRes, error) {
