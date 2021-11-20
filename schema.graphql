@@ -20,7 +20,7 @@ type Mutation {
 
 type Query {
     """ Post """
-    feed(first: Int!, after: ID, filter:[ID!]): FeedResponse!
+    feed(first: Int!, after: ID, type: String): FeedResponse!
     post(id: ID!): PostResponse!
     menfess: MenfessResponse!
     avatars: AvatarResponse!

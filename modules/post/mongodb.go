@@ -44,12 +44,18 @@ func (m *postModule) FindPostListByParentIDAndAuthorIDs(ctx context.Context, par
 	if pagination.After == "" {
 		pagination.After = "ffffffffffffffffffffffff"
 	}
+	filter := mongolib.Filter().
+		Equal("parent_id", mongolib.ObjectID(parentID)).
+		LessThan("_id", mongolib.ObjectID(pagination.After))
+	if len(authorIDs) > 0 {
+		ids := make([]primitive.ObjectID, len(authorIDs))
+		for i, v := range authorIDs {
+			ids[i] = mongolib.ObjectID(v)
+		}
+		filter = filter.In("author_id", ids)
+	}
 	if err := m.post.Aggregate().
-		Match(mongolib.Filter().
-			Equal("parent_id", mongolib.ObjectID(parentID)).
-			// TODO: Need fixing filter author ids
-			//In("author_id", authorIDs).
-			LessThan("_id", mongolib.ObjectID(pagination.After))).
+		Match(filter).
 		Sort("_id", mongolib.Descending).
 		Limit(pagination.First).
 		Lookup("user", "author_id", "_id", "author").

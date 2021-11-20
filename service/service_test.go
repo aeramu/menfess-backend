@@ -683,7 +683,6 @@ func Test_service_GetPostList(t *testing.T)  {
 		err = errors.New("some error")
 		req = api.GetPostListReq{
 			ParentID:   "asdf",
-			AuthorIDs:  []string{"123", "456"},
 			UserID:     "user-id",
 			Pagination: api.PaginationReq{
 				First: 10,
@@ -722,7 +721,7 @@ func Test_service_GetPostList(t *testing.T)  {
 				mockPostModule.On("FindPostListByParentIDAndAuthorIDs",
 					mock.Anything,
 					req.ParentID,
-					req.AuthorIDs,
+					mock.Anything,
 					req.UserID,
 					req.Pagination,
 				).Return(nil, nil, err)
@@ -741,7 +740,7 @@ func Test_service_GetPostList(t *testing.T)  {
 				mockPostModule.On("FindPostListByParentIDAndAuthorIDs",
 					mock.Anything,
 					req.ParentID,
-					req.AuthorIDs,
+					mock.Anything,
 					req.UserID,
 					req.Pagination,
 				).Return([]entity.Post{}, &paginationRes, nil)

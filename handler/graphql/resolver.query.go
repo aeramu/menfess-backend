@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"context"
+	"github.com/aeramu/menfess-backend/constants"
 
 	"github.com/aeramu/menfess-backend/service/api"
 	"github.com/graph-gophers/graphql-go"
@@ -30,9 +31,9 @@ func (r *Resolver) Post(ctx context.Context, input struct {
 }
 
 func (r *Resolver) Feed(ctx context.Context, input struct {
+	Type   *string
 	First  int32
 	After  *graphql.ID
-	Filter *[]graphql.ID
 }) FeedResponse {
 	token, err := DecodeToken(ctx)
 	if err != nil {
@@ -40,7 +41,7 @@ func (r *Resolver) Feed(ctx context.Context, input struct {
 			Error: Error(err),
 		}
 	}
-	req := api.GetPostListReq{
+	req := api.FeedReq{
 		UserID: token.UserID,
 		Pagination: api.PaginationReq{
 			First: int(input.First),
@@ -49,7 +50,12 @@ func (r *Resolver) Feed(ctx context.Context, input struct {
 	if input.After != nil {
 		req.Pagination.After = string(*input.After)
 	}
-	res, err := r.svc.GetPostList(ctx, req)
+	if input.Type != nil {
+		req.Type = *input.Type
+	} else {
+		req.Type = constants.FeedTypeAll
+	}
+	res, err := r.svc.Feed(ctx, req)
 	if err != nil {
 		return FeedResponse{Error: Error(err)}
 	}

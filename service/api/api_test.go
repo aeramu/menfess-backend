@@ -322,7 +322,6 @@ func TestGetPostListReq_Validate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			req := &GetPostListReq{
 				ParentID:   tt.fields.ParentID,
-				AuthorIDs:  tt.fields.AuthorIDs,
 				UserID:     tt.fields.UserID,
 				Pagination: tt.fields.Pagination,
 			}

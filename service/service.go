@@ -8,6 +8,7 @@ import (
 )
 
 type Service interface {
+	// User
 	Login(ctx context.Context, req api.LoginReq) (*api.LoginRes, error)
 	Register(ctx context.Context, req api.RegisterReq) (*api.RegisterRes, error)
 	Logout(ctx context.Context, req api.LogoutReq) (*api.LogoutRes, error)
@@ -15,6 +16,9 @@ type Service interface {
 	GetUser(ctx context.Context, req api.GetUserReq) (*api.GetUserRes, error)
 	FollowUser(ctx context.Context, req api.FollowUserReq) (*api.FollowUserRes, error)
 	GetMenfessList(ctx context.Context, req api.GetMenfessListReq) (*api.GetMenfessListRes, error)
+
+	// Post
+	Feed(ctx context.Context, req api.FeedReq) (*api.FeedRes, error)
 	GetPost(ctx context.Context, req api.GetPostReq) (*api.GetPostRes, error)
 	GetPostList(ctx context.Context, req api.GetPostListReq) (*api.GetPostListRes, error)
 	CreatePost(ctx context.Context, req api.CreatePostReq) (*api.CreatePostRes, error)
@@ -177,7 +181,7 @@ func (s *service) GetPostList(ctx context.Context, req api.GetPostListReq) (*api
 
 	postList, pagination, err := s.adapter.PostModule.FindPostListByParentIDAndAuthorIDs(ctx,
 		req.ParentID,
-		req.AuthorIDs,
+		nil,
 		req.UserID,
 		req.Pagination)
 	if err != nil {

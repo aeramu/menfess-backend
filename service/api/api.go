@@ -125,7 +125,6 @@ func (req GetPostReq) Validate() error {
 
 type GetPostListReq struct {
 	ParentID   string
-	AuthorIDs  []string
 	UserID     string
 	Pagination PaginationReq
 }
