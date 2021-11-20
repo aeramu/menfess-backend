@@ -58,7 +58,7 @@ func (m *notificationModule) removePushToken(ctx context.Context, userID string,
 	err := m.pushToken.Query().
 		Equal("user_id", mongolib.ObjectID(userID)).
 		Equal("token", token).
-		DeleteOne(ctx)
+		Delete(ctx)
 	if err != nil {
 		return err
 	}
