@@ -47,6 +47,7 @@ func (u *userModule) InsertUser(ctx context.Context, user entity.User) (string, 
 		Avatar:   user.Profile.Avatar,
 		Bio:      user.Profile.Bio,
 		Type:     "user",
+		Follow:   &[]primitive.ObjectID{},
 	}
 	if err := u.user.Save(ctx, id, model); err != nil {
 		return "", err
@@ -84,8 +85,11 @@ func (u *userModule) GetFollowedUserID(ctx context.Context, userID string) ([]st
 	if err := u.user.FindByID(ctx, mongolib.ObjectID(userID)).Consume(&model); err != nil {
 		return nil, err
 	}
-	result := make([]string, len(model.Follow))
-	for i, v := range model.Follow {
+	if model.Follow == nil{
+		model.Follow = &[]primitive.ObjectID{}
+	}
+	result := make([]string, len(*model.Follow))
+	for i, v := range *model.Follow {
 		result[i] = v.Hex()
 	}
 	return result, nil
@@ -116,7 +120,7 @@ type User struct {
 	Avatar string               `bson:"avatar"`
 	Bio    string               `bson:"bio"`
 	Type   string               `bson:"type"`
-	Follow []primitive.ObjectID `bson:"follow"`
+	Follow *[]primitive.ObjectID `bson:"follow"`
 }
 
 func (u User) Entity() *entity.User {
