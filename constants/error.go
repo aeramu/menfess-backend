@@ -22,4 +22,5 @@ var (
 	ErrInvalidBody = errors.New("body is not valid")
 
 	ErrInvalidFeedType = errors.New("invalid feed type")
+	ErrUserNotFollowAnyone = errors.New("user not following anyone")
 )

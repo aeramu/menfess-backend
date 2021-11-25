@@ -318,6 +318,9 @@ func (s *service) Feed(ctx context.Context, req api.FeedReq) (*api.FeedRes, erro
 			s.adapter.LogModule.Log(err, req, "[Feed] failed get followed user")
 			return nil, constants.ErrInternalServerError
 		}
+		if len(userIDs) == 0 {
+			return nil, constants.ErrUserNotFollowAnyone
+		}
 		followed = userIDs
 	}
 
