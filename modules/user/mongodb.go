@@ -115,12 +115,12 @@ func (u *userModule) UpdateFollowStatus(ctx context.Context, follower, followed,
 }
 
 type User struct {
-	ID     primitive.ObjectID   `bson:"_id"`
-	Name   string               `bson:"name"`
-	Avatar string               `bson:"avatar"`
-	Bio    string               `bson:"bio"`
-	Type   string               `bson:"type"`
-	Follow *[]primitive.ObjectID `bson:"follow"`
+	ID     primitive.ObjectID    `bson:"_id"`
+	Name   string                `bson:"name"`
+	Avatar string                `bson:"avatar"`
+	Bio    string                `bson:"bio"`
+	Type   string                `bson:"type"`
+	Follow *[]primitive.ObjectID `bson:"follow,omitempty"`
 }
 
 func (u User) Entity() *entity.User {
