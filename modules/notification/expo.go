@@ -56,12 +56,15 @@ func (m *notificationModule) processNotificationResponse(ctx context.Context, re
 		}
 		if v.Details.Error == "DeviceNotRegistered" {
 			errorToken = append(errorToken, tokens[i])
+			continue
 		}
 		logrus.Errorln("Expo token error, token:", tokens[i], v.Details.Error)
 	}
-	err := m.pushToken.Query().In("token", errorToken).Delete(ctx)
-	if err != nil {
-		logrus.Errorln("Failed delete invalid expo token, err:", err)
+	if len(errorToken) > 0 {
+		err := m.pushToken.Query().In("token", errorToken).Delete(ctx)
+		if err != nil {
+			logrus.Errorln("Failed delete invalid expo token, err:", err)
+		}
 	}
 }
 
